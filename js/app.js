@@ -125,7 +125,10 @@ class WorkChat {
     showWelcomeState() {
         document.getElementById('welcome-state').style.display = '';
         document.getElementById('chat-state').style.display = 'none';
-        document.getElementById('users-panel').classList.remove('visible');
+        document.getElementById('users-panel').classList.add('visible');
+        const titleEl = document.getElementById('users-panel-title');
+        if (titleEl) titleEl.textContent = '로비 참여자';
+        document.getElementById('room-info-panel').style.display = 'none';
         this.currentRoomId = null;
         this.currentRoomName = '';
         this.currentRoomTopic = '';
@@ -141,6 +144,8 @@ class WorkChat {
         document.getElementById('welcome-state').style.display = 'none';
         document.getElementById('chat-state').style.display = '';
         document.getElementById('users-panel').classList.add('visible');
+        const titleEl = document.getElementById('users-panel-title');
+        if (titleEl) titleEl.textContent = '참여자';
         document.getElementById('current-room-name').textContent = roomName;
         document.getElementById('room-lock-icon').textContent = isPrivate ? '🔒' : '';
 
@@ -302,6 +307,27 @@ class WorkChat {
     updateLobbyCount() {
         const el = document.getElementById('lobby-user-count');
         if (el) el.textContent = `${this.lobbyUsers.length}명 온라인`;
+        if (!this.currentRoomId) this.renderLobbyUsers();
+    }
+
+    renderLobbyUsers() {
+        const el = document.getElementById('user-list');
+        if (!el) return;
+        el.innerHTML = '';
+        for (const u of this.lobbyUsers) {
+            const isMe = u.id === this.lobbyNet.playerId;
+            const item = document.createElement('div');
+            item.className = `user-item${isMe ? ' me' : ''}`;
+            item.innerHTML = `
+                <span class="user-avatar">👤</span>
+                <div class="user-info">
+                    <span class="user-name">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
+                </div>
+            `;
+            el.appendChild(item);
+        }
+        const countEl = document.getElementById('user-count');
+        if (countEl) countEl.textContent = this.lobbyUsers.length;
     }
 
     setupLobbyNetworkHandlers() {
