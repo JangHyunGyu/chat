@@ -431,8 +431,24 @@ a { color: var(--accent); text-decoration: none; }
 .chat-header-right {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     flex-shrink: 0;
+}
+
+.btn-leave-room {
+    background: transparent;
+    color: var(--danger, #ef4444);
+    border: 1px solid var(--danger, #ef4444);
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.btn-leave-room:hover {
+    background: var(--danger, #ef4444);
+    color: #fff;
 }
 
 .btn-icon {
