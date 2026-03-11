@@ -371,6 +371,11 @@ class WorkChat {
             this.addLobbyMessage(msg.name, msg.message, 'chat');
         });
 
+        this.lobbyNet.on('roomInvite', (msg) => {
+            if (msg.targetId !== this.lobbyNet.playerId) return;
+            this.showInviteDialog(msg.fromName, msg.roomId, msg.roomName, msg.password);
+        });
+
         this.lobbyNet.on('disconnected', () => {
             this.lobbyUsers = [];
             this.updateLobbyCount();
@@ -403,8 +408,6 @@ class WorkChat {
             this.network.leaveRoom();
             this.network.disconnect();
         }
-        // Leave lobby chat when entering a room
-        this.disconnectFromLobbyChat();
         this.stopRoomListRefresh();
 
         try {
@@ -428,8 +431,6 @@ class WorkChat {
             this.network.leaveRoom();
             this.network.disconnect();
         }
-        // Leave lobby chat when creating a room
-        this.disconnectFromLobbyChat();
         this.stopRoomListRefresh();
 
         try {
@@ -573,6 +574,89 @@ class WorkChat {
 
         const inviteBtn = document.getElementById('btn-copy-invite');
         if (inviteBtn) inviteBtn.style.display = (this.isHost && this.isPrivateRoom) ? '' : 'none';
+
+        const inviteUserBtn = document.getElementById('btn-invite-user');
+        if (inviteUserBtn) inviteUserBtn.style.display = this.isHost ? '' : 'none';
+    }
+
+    // ─────────────────── Invite ───────────────────
+
+    openInviteUserModal() {
+        const roomMemberNames = new Set(this.users.map(u => u.name));
+        const candidates = this.lobbyUsers.filter(u => !roomMemberNames.has(u.name));
+
+        const list = document.getElementById('invite-user-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        if (candidates.length === 0) {
+            list.innerHTML = '<div class="invite-empty">초대할 수 있는 온라인 사용자가 없습니다.</div>';
+        } else {
+            for (const u of candidates) {
+                const item = document.createElement('div');
+                item.className = 'invite-user-item';
+                item.innerHTML = `
+                    <span class="user-avatar">👤</span>
+                    <span class="invite-user-name">${this.escapeHtml(u.name)}</span>
+                    <button class="btn-send-invite" data-id="${u.id}" data-name="${this.escapeHtml(u.name)}">초대</button>
+                `;
+                item.querySelector('.btn-send-invite').addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const name = e.target.dataset.name;
+                    this.sendRoomInvite(id, name);
+                    document.getElementById('invite-user-modal').classList.remove('active');
+                });
+                list.appendChild(item);
+            }
+        }
+        document.getElementById('invite-user-modal').classList.add('active');
+    }
+
+    sendRoomInvite(targetId, targetName) {
+        this.lobbyNet.send({
+            type: 'roomInvite',
+            targetId,
+            fromName: this.nickname,
+            roomId: this.currentRoomId,
+            roomName: this.currentRoomName,
+            password: this.currentPassword,
+        });
+        this.showToast(`${targetName}님에게 초대장을 보냈습니다.`);
+    }
+
+    showInviteDialog(fromName, roomId, roomName, password) {
+        const existing = document.getElementById('invite-dialog');
+        if (existing) existing.remove();
+
+        const d = document.createElement('div');
+        d.id = 'invite-dialog';
+        d.className = 'invite-dialog';
+        d.innerHTML = `
+            <div class="invite-dialog-box">
+                <div class="invite-dialog-title">📨 초대</div>
+                <div class="invite-dialog-body">
+                    <strong>${this.escapeHtml(fromName)}</strong>님이<br>
+                    <strong>'${this.escapeHtml(roomName)}'</strong>에 초대했습니다.
+                </div>
+                <div class="invite-dialog-actions">
+                    <button class="btn-secondary" id="btn-invite-decline">거절</button>
+                    <button class="btn-confirm" id="btn-invite-accept">수락</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(d);
+
+        document.getElementById('btn-invite-accept').addEventListener('click', () => {
+            d.remove();
+            if (this.currentRoomId) {
+                this.network.leaveRoom();
+                this.network.disconnect();
+                this.showWelcomeState();
+            }
+            this.doJoinRoom(roomId, password);
+        });
+        document.getElementById('btn-invite-decline').addEventListener('click', () => d.remove());
+        setTimeout(() => d.remove(), 30000);
     }
 
     // ─────────────────── Host Actions ───────────────────
@@ -896,6 +980,15 @@ class WorkChat {
 
         document.getElementById('btn-toggle-members')?.addEventListener('click', () => {
             document.getElementById('users-panel').classList.toggle('visible');
+        });
+
+        // Invite user modal
+        document.getElementById('btn-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
+        document.getElementById('btn-invite-modal-close')?.addEventListener('click', () => {
+            document.getElementById('invite-user-modal').classList.remove('active');
+        });
+        document.getElementById('invite-user-modal')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) document.getElementById('invite-user-modal').classList.remove('active');
         });
     }
 

@@ -672,6 +672,9 @@ a { color: var(--accent); text-decoration: none; }
     padding: 12px;
     border-top: 1px solid var(--border);
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .btn-invite {
@@ -986,6 +989,91 @@ input[type="range"] {
     accent-color: var(--accent);
     height: 4px;
     cursor: pointer;
+}
+
+/* ─── Invite User Modal ─── */
+.modal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+.modal-header-row h3 { margin: 0; }
+
+.invite-user-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 12px;
+}
+
+.invite-user-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border);
+}
+.invite-user-item:last-child { border-bottom: none; }
+.invite-user-name { flex: 1; font-size: 0.95rem; }
+.btn-send-invite {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.btn-send-invite:hover { opacity: 0.85; }
+.invite-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px 0;
+    font-size: 0.9rem;
+}
+
+/* ─── Invite Dialog (incoming invite popup) ─── */
+.invite-dialog {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+    z-index: 9999;
+    pointer-events: none;
+}
+.invite-dialog-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    min-width: 260px;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    pointer-events: all;
+    animation: slideDown 0.2s ease;
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.invite-dialog-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--accent);
+}
+.invite-dialog-body {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+.invite-dialog-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
 }
 
 /* ─── Toast ─── */
