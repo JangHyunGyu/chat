@@ -1,0 +1,931 @@
+// WorkChat Application
+'use strict';
+
+const RELAY_URL = 'wss://relay.archerlab.dev';
+const LOBBY_GAME_ID = 'workchat-lobby';
+const LOBBY_ROOM_ID = 'global';
+const MAX_PLAYERS_DEFAULT = 10;
+const MAX_PLAYERS_LIMIT = 100;
+
+class WorkChat {
+    constructor() {
+        this.network = new NetworkClient('workchat');       // Regular rooms
+        this.lobbyNet = new NetworkClient(LOBBY_GAME_ID);  // Lobby chat
+
+        // Settings
+        this.nickname = localStorage.getItem('wc_nickname') || '';
+        this.opacity = parseFloat(localStorage.getItem('wc_opacity') || '1');
+
+        // Room state
+        this.currentRoomId = null;
+        this.currentRoomName = '';
+        this.currentRoomTopic = '';
+        this.currentPassword = null;
+        this.isPrivateRoom = false;
+        this.maxPlayers = MAX_PLAYERS_DEFAULT;
+        this.isHost = false;
+        this.displayHostId = null;
+        this.users = [];
+        this.lobbyUsers = [];
+
+        // Lobby state
+        this.roomListTimer = null;
+        this.pendingJoinRoom = null;
+
+        this.init();
+    }
+
+    // ─────────────────── Init ───────────────────
+
+    init() {
+        this.applyOpacity();
+        this.setupEventListeners();
+        this.setupNetworkHandlers();
+        this.setupLobbyNetworkHandlers();
+
+        const inviteHandled = this.handleInviteUrl();
+        if (!inviteHandled) {
+            if (this.nickname) {
+                this.showLobby();
+            } else {
+                this.showSetupModal();
+            }
+        }
+    }
+
+    // ─────────────────── Settings ───────────────────
+
+    applyOpacity() {
+        document.documentElement.style.setProperty('--app-opacity', this.opacity);
+        const slider = document.getElementById('opacity-slider');
+        const value = document.getElementById('opacity-value');
+        if (slider) slider.value = Math.round(this.opacity * 100);
+        if (value) value.textContent = Math.round(this.opacity * 100) + '%';
+    }
+
+    updateAvatar(name) {
+        const el = document.getElementById('my-avatar');
+        if (el) el.textContent = name ? name.charAt(0).toUpperCase() : '?';
+    }
+
+    // ─────────────────── Screens ───────────────────
+
+    showSetupModal() {
+        document.getElementById('setup-modal').classList.add('active');
+        setTimeout(() => document.getElementById('setup-name').focus(), 100);
+    }
+
+    hideSetupModal() {
+        document.getElementById('setup-modal').classList.remove('active');
+    }
+
+    showLobby() {
+        document.getElementById('app').style.display = '';
+        document.getElementById('my-name-display').textContent = this.nickname;
+        document.getElementById('settings-name').value = this.nickname;
+        this.updateAvatar(this.nickname);
+        this.fetchAndRenderRooms();
+        this.startRoomListRefresh();
+        this.showWelcomeState();
+        this.setMobileView('rooms');
+        this.connectToLobbyChat();
+    }
+
+    showWelcomeState() {
+        document.getElementById('welcome-state').style.display = '';
+        document.getElementById('chat-state').style.display = 'none';
+        document.getElementById('users-panel').classList.remove('visible');
+        this.currentRoomId = null;
+        this.currentRoomName = '';
+        this.currentRoomTopic = '';
+        this.currentPassword = null;
+        this.isPrivateRoom = false;
+        this.maxPlayers = MAX_PLAYERS_DEFAULT;
+        this.isHost = false;
+        this.displayHostId = null;
+        this.users = [];
+    }
+
+    showChatState(roomName, topic, isPrivate) {
+        document.getElementById('welcome-state').style.display = 'none';
+        document.getElementById('chat-state').style.display = '';
+        document.getElementById('users-panel').classList.add('visible');
+        document.getElementById('current-room-name').textContent = roomName;
+        document.getElementById('room-lock-icon').textContent = isPrivate ? '🔒' : '';
+
+        const topicEl = document.getElementById('current-room-topic');
+        if (topicEl) topicEl.textContent = topic ? ` · ${topic}` : '';
+
+        this.clearMessages();
+        this.updateRoomInfoPanel();
+        this.setMobileView('chat');
+    }
+
+    updateRoomInfoPanel() {
+        const panel = document.getElementById('room-info-panel');
+        const topicEl = document.getElementById('room-topic-panel');
+        const capEl = document.getElementById('room-capacity-panel');
+        const hasTopic = !!this.currentRoomTopic;
+
+        if (hasTopic || this.maxPlayers) {
+            panel.style.display = '';
+            if (topicEl) topicEl.textContent = this.currentRoomTopic || '';
+            if (capEl) capEl.textContent = `최대 ${this.maxPlayers}명`;
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+
+    // ─────────────────── Mobile ───────────────────
+
+    setMobileView(view) {
+        const app = document.getElementById('app');
+        app.dataset.mobileView = view;
+        document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        const backBtn = document.getElementById('chat-back-btn');
+        if (backBtn) backBtn.style.display = (view === 'chat' || view === 'members') ? '' : 'none';
+    }
+
+    // ─────────────────── Room List ───────────────────
+
+    startRoomListRefresh() {
+        this.stopRoomListRefresh();
+        this.roomListTimer = setInterval(() => this.fetchAndRenderRooms(), 5000);
+    }
+
+    stopRoomListRefresh() {
+        if (this.roomListTimer) { clearInterval(this.roomListTimer); this.roomListTimer = null; }
+    }
+
+    async fetchAndRenderRooms() {
+        try {
+            const data = await this.network.fetchRooms(RELAY_URL);
+            this.renderRooms(data.rooms || []);
+        } catch {
+            const el = document.getElementById('room-list-el');
+            if (el) el.innerHTML = '<div class="room-list-empty">서버 연결 실패</div>';
+        }
+    }
+
+    renderRooms(rooms) {
+        const el = document.getElementById('room-list-el');
+        if (!el) return;
+
+        if (rooms.length === 0) {
+            el.innerHTML = '<div class="room-list-empty">채팅방이 없습니다.<br>새 방을 만들어보세요.</div>';
+            return;
+        }
+
+        el.innerHTML = '';
+        for (const room of rooms) {
+            const isPrivate = room.metadata?.password;
+            const roomName = room.metadata?.roomName || room.hostName + '의 방';
+            const topic = room.metadata?.topic || '';
+            const maxP = room.metadata?.maxPlayers || MAX_PLAYERS_DEFAULT;
+            const isFull = room.playerCount >= maxP;
+            const isCurrent = room.roomId === this.currentRoomId;
+
+            const item = document.createElement('div');
+            item.className = `room-item${isCurrent ? ' active' : ''}${isFull && !isCurrent ? ' room-full' : ''}`;
+
+            item.innerHTML = `
+                <span class="room-item-icon">${isPrivate ? '🔒' : '#'}</span>
+                <div class="room-item-info">
+                    <span class="room-item-name">${this.escapeHtml(roomName)}</span>
+                    <span class="room-item-meta">${room.playerCount}/${maxP}명${topic ? ' · ' + this.escapeHtml(topic.slice(0, 20)) : ''}</span>
+                    ${isFull && !isCurrent ? '<span class="room-item-full">가득 참</span>' : ''}
+                </div>
+            `;
+
+            if (!isCurrent && !isFull) {
+                item.addEventListener('click', () => this.tryJoinRoom(room));
+            }
+            el.appendChild(item);
+        }
+    }
+
+    // ─────────────────── Lobby Chat ───────────────────
+
+    async connectToLobbyChat() {
+        if (this.lobbyNet.connected) return;
+        this.addLobbyMessage('', '로비에 연결 중...', 'system');
+        try {
+            await this.lobbyNet.joinRoom(RELAY_URL, LOBBY_ROOM_ID, this.nickname, null);
+        } catch {
+            // Lobby room may not exist yet - try creating it (first user ever)
+            try {
+                await this.lobbyNet.createRoom(RELAY_URL, this.nickname, null);
+            } catch {
+                this.addLobbyMessage('', '로비 채팅 연결 실패. 새로고침 해주세요.', 'system');
+            }
+        }
+    }
+
+    disconnectFromLobbyChat() {
+        if (this.lobbyNet.connected) {
+            this.lobbyNet.leaveRoom();
+            this.lobbyNet.disconnect();
+        }
+        this.lobbyUsers = [];
+        this.updateLobbyCount();
+    }
+
+    addLobbyMessage(name, text, type = 'chat') {
+        const el = document.getElementById('lobby-messages');
+        if (!el) return;
+
+        const msg = document.createElement('div');
+        if (type === 'system') {
+            msg.className = 'msg msg-system';
+            msg.textContent = text;
+        } else {
+            const isMe = name === this.nickname;
+            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            msg.innerHTML = `
+                <div class="msg-header">
+                    <span class="msg-name">${this.escapeHtml(name)}</span>
+                    <span class="msg-time">${time}</span>
+                </div>
+                <div class="msg-text">${this.escapeHtml(text)}</div>
+            `;
+        }
+
+        el.appendChild(msg);
+        el.scrollTop = el.scrollHeight;
+        while (el.children.length > 100) el.removeChild(el.firstChild);
+    }
+
+    sendLobbyMessage() {
+        const input = document.getElementById('lobby-msg-input');
+        const text = input.value.trim();
+        if (!text || !this.lobbyNet.connected) return;
+        this.lobbyNet.sendChat(text);
+        input.value = '';
+        input.focus();
+    }
+
+    updateLobbyCount() {
+        const el = document.getElementById('lobby-user-count');
+        if (el) el.textContent = `${this.lobbyUsers.length}명 온라인`;
+    }
+
+    setupLobbyNetworkHandlers() {
+        this.lobbyNet.on('roomCreated', (msg) => {
+            this.lobbyUsers = msg.players || [];
+            this.updateLobbyCount();
+            this.addLobbyMessage('', '로비에 연결되었습니다.', 'system');
+        });
+
+        this.lobbyNet.on('joined', (msg) => {
+            this.lobbyUsers = msg.players || [];
+            this.updateLobbyCount();
+            this.addLobbyMessage('', '로비에 연결되었습니다.', 'system');
+        });
+
+        this.lobbyNet.on('playerJoined', (msg) => {
+            if (msg.players) { this.lobbyUsers = msg.players; this.updateLobbyCount(); }
+            if (msg.player) {
+                this.addLobbyMessage('', `${msg.player.name}님이 로비에 입장했습니다.`, 'system');
+            }
+        });
+
+        this.lobbyNet.on('playerLeft', (msg) => {
+            const leftUser = this.lobbyUsers.find(u => !msg.players?.find(p => p.id === u.id));
+            if (leftUser) this.addLobbyMessage('', `${leftUser.name}님이 로비에서 나갔습니다.`, 'system');
+            if (msg.players) { this.lobbyUsers = msg.players; this.updateLobbyCount(); }
+        });
+
+        this.lobbyNet.on('roomState', (msg) => {
+            if (msg.players) { this.lobbyUsers = msg.players; this.updateLobbyCount(); }
+        });
+
+        this.lobbyNet.on('chat', (msg) => {
+            this.addLobbyMessage(msg.name, msg.message, 'chat');
+        });
+
+        this.lobbyNet.on('disconnected', () => {
+            this.lobbyUsers = [];
+            this.updateLobbyCount();
+        });
+    }
+
+    // ─────────────────── Room Actions ───────────────────
+
+    tryJoinRoom(room) {
+        if (!this.nickname) { this.showSetupModal(); return; }
+
+        const maxP = room.metadata?.maxPlayers || MAX_PLAYERS_DEFAULT;
+        if (room.playerCount >= maxP) {
+            this.showToast('채팅방이 가득 찼습니다.');
+            return;
+        }
+
+        if (room.metadata?.password) {
+            this.pendingJoinRoom = room;
+            document.getElementById('join-password').value = '';
+            document.getElementById('password-modal').classList.add('active');
+            setTimeout(() => document.getElementById('join-password').focus(), 100);
+        } else {
+            this.doJoinRoom(room.roomId, null);
+        }
+    }
+
+    async doJoinRoom(roomId, password) {
+        if (this.currentRoomId) {
+            this.network.leaveRoom();
+            this.network.disconnect();
+        }
+        // Leave lobby chat when entering a room
+        this.disconnectFromLobbyChat();
+        this.stopRoomListRefresh();
+
+        try {
+            await this.network.joinRoom(RELAY_URL, roomId, this.nickname, password);
+        } catch (e) {
+            const msg = (e.message || '').toLowerCase();
+            if (msg.includes('password') || msg.includes('wrong')) {
+                this.showToast('비밀번호가 틀렸습니다.');
+            } else {
+                this.showToast('방에 입장할 수 없습니다.');
+            }
+            this.startRoomListRefresh();
+            this.fetchAndRenderRooms();
+            // Reconnect to lobby
+            this.connectToLobbyChat();
+        }
+    }
+
+    async createRoom(roomName, topic, password, maxPlayers) {
+        if (this.currentRoomId) {
+            this.network.leaveRoom();
+            this.network.disconnect();
+        }
+        // Leave lobby chat when creating a room
+        this.disconnectFromLobbyChat();
+        this.stopRoomListRefresh();
+
+        try {
+            await this.network.createRoom(RELAY_URL, this.nickname, password);
+            this.currentPassword = password || null;
+            this.network.setMetadata({
+                roomName,
+                topic: topic || '',
+                password: !!password,
+                maxPlayers: maxPlayers || MAX_PLAYERS_DEFAULT,
+            });
+        } catch {
+            this.showToast('방 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
+            this.startRoomListRefresh();
+            this.connectToLobbyChat();
+        }
+    }
+
+    leaveRoom() {
+        this.network.leaveRoom();
+        this.network.disconnect();
+        this.showWelcomeState();
+        this.fetchAndRenderRooms();
+        this.startRoomListRefresh();
+        // Reconnect to lobby
+        this.connectToLobbyChat();
+        this.setMobileView('rooms');
+    }
+
+    // ─────────────────── Nickname uniqueness check ───────────────────
+
+    checkNicknameUniqueness(players) {
+        const myId = this.network.playerId;
+        const duplicate = players.find(p => p.id !== myId && p.name === this.nickname);
+        if (duplicate) {
+            this.showToast(`이미 "${this.nickname}" 닉네임을 사용 중인 사람이 있습니다.`);
+            this.network.leaveRoom();
+            this.network.disconnect();
+            this.showWelcomeState();
+            this.fetchAndRenderRooms();
+            this.startRoomListRefresh();
+            this.connectToLobbyChat();
+            return false;
+        }
+        return true;
+    }
+
+    // ─────────────────── Room Chat ───────────────────
+
+    clearMessages() {
+        const el = document.getElementById('messages');
+        if (el) el.innerHTML = '';
+    }
+
+    addMessage(name, text, type = 'chat') {
+        const el = document.getElementById('messages');
+        if (!el) return;
+
+        const msg = document.createElement('div');
+        if (type === 'system') {
+            msg.className = 'msg msg-system';
+            msg.textContent = text;
+        } else {
+            const isMe = name === this.nickname;
+            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            msg.innerHTML = `
+                <div class="msg-header">
+                    <span class="msg-name">${this.escapeHtml(name)}</span>
+                    <span class="msg-time">${time}</span>
+                </div>
+                <div class="msg-text">${this.escapeHtml(text)}</div>
+            `;
+        }
+
+        el.appendChild(msg);
+        el.scrollTop = el.scrollHeight;
+        while (el.children.length > 200) el.removeChild(el.firstChild);
+    }
+
+    sendMessage() {
+        const input = document.getElementById('msg-input');
+        const text = input.value.trim();
+        if (!text || !this.currentRoomId) return;
+        this.network.sendChat(text);
+        input.value = '';
+        input.focus();
+    }
+
+    // ─────────────────── User List ───────────────────
+
+    renderUsers(users) {
+        this.users = users;
+        const el = document.getElementById('user-list');
+        if (!el) return;
+
+        el.innerHTML = '';
+        for (const u of users) {
+            const isDisplayHost = u.id === this.displayHostId || u.isHost;
+            const isMe = u.id === this.network.playerId;
+
+            const item = document.createElement('div');
+            item.className = `user-item${isMe ? ' me' : ''}`;
+
+            let actions = '';
+            if (this.isHost && !isMe) {
+                actions = `
+                    <div class="user-actions">
+                        <button class="btn-user-action btn-transfer" data-id="${u.id}" title="방장 넘기기">👑</button>
+                        <button class="btn-user-action btn-kick" data-id="${u.id}" title="내보내기">✕</button>
+                    </div>
+                `;
+            }
+
+            item.innerHTML = `
+                <span class="user-avatar">${isDisplayHost ? '👑' : '👤'}</span>
+                <div class="user-info">
+                    <span class="user-name">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
+                    ${isDisplayHost ? '<span class="user-role">방장</span>' : ''}
+                </div>
+                ${actions}
+            `;
+
+            if (this.isHost && !isMe) {
+                item.querySelector('.btn-kick')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.kickUser(u.id, u.name);
+                });
+                item.querySelector('.btn-transfer')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.transferHostTo(u.id, u.name);
+                });
+            }
+
+            el.appendChild(item);
+        }
+
+        const countEl = document.getElementById('user-count');
+        if (countEl) countEl.textContent = `${users.length}/${this.maxPlayers}`;
+
+        const inviteBtn = document.getElementById('btn-copy-invite');
+        if (inviteBtn) inviteBtn.style.display = (this.isHost && this.isPrivateRoom) ? '' : 'none';
+    }
+
+    // ─────────────────── Host Actions ───────────────────
+
+    kickUser(userId, userName) {
+        if (!this.isHost) return;
+        if (!confirm(`${userName}님을 채팅방에서 내보내시겠습니까?`)) return;
+        this.network.kick(userId);
+    }
+
+    transferHostTo(targetId, targetName) {
+        if (!this.isHost) return;
+        if (!confirm(`${targetName}님에게 방장 권한을 넘기시겠습니까?`)) return;
+
+        this.network.transferHost(targetId);
+        this.displayHostId = targetId;
+        this.isHost = false;
+        this.network.isHost = false;
+
+        this.renderUsers(this.users);
+        this.updateHostUI();
+        this.addMessage('', `${targetName}님에게 방장 권한이 이전되었습니다.`, 'system');
+    }
+
+    updateHostUI() {
+        const inviteBtn = document.getElementById('btn-copy-invite');
+        if (inviteBtn) inviteBtn.style.display = (this.isHost && this.isPrivateRoom) ? '' : 'none';
+    }
+
+    // ─────────────────── Invite ───────────────────
+
+    generateInviteLink() {
+        const base = window.location.origin + window.location.pathname;
+        const params = new URLSearchParams({ room: this.currentRoomId });
+        if (this.currentPassword) params.set('pw', this.currentPassword);
+        return `${base}?${params.toString()}`;
+    }
+
+    handleInviteUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const roomId = params.get('room');
+        const password = params.get('pw');
+        if (!roomId) return false;
+
+        window.history.replaceState({}, '', window.location.pathname);
+
+        if (!this.nickname) {
+            sessionStorage.setItem('wc_pending_room', roomId);
+            if (password) sessionStorage.setItem('wc_pending_pw', password);
+            this.showSetupModal();
+            return true;
+        }
+
+        setTimeout(() => {
+            this.showLobby();
+            this.doJoinRoom(roomId, password || null);
+        }, 100);
+        return true;
+    }
+
+    // ─────────────────── Room Network Handlers ───────────────────
+
+    setupNetworkHandlers() {
+        this.network.on('roomCreated', (msg) => {
+            this.currentRoomId = msg.roomId;
+            const meta = msg.metadata || {};
+            this.currentRoomName = meta.roomName || this.nickname + '의 방';
+            this.currentRoomTopic = meta.topic || '';
+            this.isPrivateRoom = !!meta.password;
+            this.maxPlayers = meta.maxPlayers || MAX_PLAYERS_DEFAULT;
+            this.isHost = true;
+            this.displayHostId = this.network.playerId;
+
+            this.showChatState(this.currentRoomName, this.currentRoomTopic, this.isPrivateRoom);
+            this.renderUsers(msg.players || []);
+            this.addMessage('', `${this.currentRoomName}을(를) 개설했습니다.`, 'system');
+            this.fetchAndRenderRooms();
+        });
+
+        this.network.on('joined', (msg) => {
+            const meta = msg.metadata || {};
+            this.currentRoomId = msg.roomId;
+            this.currentRoomName = meta.roomName || '채팅방';
+            this.currentRoomTopic = meta.topic || '';
+            this.isPrivateRoom = !!meta.password;
+            this.maxPlayers = meta.maxPlayers || MAX_PLAYERS_DEFAULT;
+            this.isHost = false;
+
+            const players = msg.players || [];
+            const hostPlayer = players.find(p => p.isHost);
+            this.displayHostId = hostPlayer?.id || null;
+
+            if (!this.checkNicknameUniqueness(players)) return;
+
+            this.showChatState(this.currentRoomName, this.currentRoomTopic, this.isPrivateRoom);
+            this.renderUsers(players);
+            this.addMessage('', `${this.currentRoomName}에 입장했습니다.`, 'system');
+            this.fetchAndRenderRooms();
+        });
+
+        this.network.on('playerJoined', (msg) => {
+            if (msg.player) {
+                if (msg.player.name === this.nickname && msg.player.id !== this.network.playerId) {
+                    this.showToast(`닉네임 중복: "${this.nickname}" 사용자가 입장했습니다.`);
+                }
+                this.addMessage('', `${msg.player.name}님이 입장했습니다.`, 'system');
+            }
+            if (msg.players) this.renderUsers(msg.players);
+            // Update room list to reflect new count
+            this.fetchAndRenderRooms();
+        });
+
+        this.network.on('playerLeft', (msg) => {
+            const leftUser = this.users.find(u => !msg.players?.find(p => p.id === u.id));
+            if (leftUser) this.addMessage('', `${leftUser.name}님이 퇴장했습니다.`, 'system');
+
+            if (msg.players) {
+                const newHost = msg.players.find(p => p.isHost);
+                const wasHostChanged = newHost && newHost.id !== this.displayHostId;
+
+                if (wasHostChanged) {
+                    this.displayHostId = newHost.id;
+                    if (newHost.id === this.network.playerId && !this.isHost) {
+                        this.isHost = true;
+                        this.network.isHost = true;
+                        this.addMessage('', '방장이 되었습니다.', 'system');
+                        this.updateHostUI();
+                    } else if (!this.isHost) {
+                        this.addMessage('', `${newHost.name}님이 방장이 되었습니다.`, 'system');
+                    }
+                }
+                this.renderUsers(msg.players);
+            }
+            // Update room list
+            this.fetchAndRenderRooms();
+        });
+
+        this.network.on('roomState', (msg) => {
+            if (msg.players) {
+                const hostPlayer = msg.players.find(p => p.isHost);
+                if (hostPlayer) this.displayHostId = hostPlayer.id;
+                this.renderUsers(msg.players);
+            }
+            if (msg.metadata) {
+                const meta = msg.metadata;
+                if (meta.roomName) {
+                    this.currentRoomName = meta.roomName;
+                    document.getElementById('current-room-name').textContent = meta.roomName;
+                }
+                if (meta.topic !== undefined) {
+                    this.currentRoomTopic = meta.topic;
+                    const topicEl = document.getElementById('current-room-topic');
+                    if (topicEl) topicEl.textContent = meta.topic ? ` · ${meta.topic}` : '';
+                }
+                if (meta.maxPlayers) this.maxPlayers = meta.maxPlayers;
+                this.updateRoomInfoPanel();
+            }
+        });
+
+        this.network.on('chat', (msg) => {
+            this.addMessage(msg.name, msg.message, 'chat');
+        });
+
+        this.network.on('kicked', () => {
+            this.network.disconnect();
+            this.showWelcomeState();
+            this.fetchAndRenderRooms();
+            this.startRoomListRefresh();
+            this.connectToLobbyChat();
+            this.showToast('채팅방에서 내보내기 되었습니다.');
+        });
+
+        // Host transfer (server broadcasts to all via default case)
+        this.network.on('hostTransfer', (msg) => {
+            const targetUser = this.users.find(u => u.id === msg.targetId);
+            if (!targetUser) return;
+
+            this.displayHostId = msg.targetId;
+            if (msg.targetId === this.network.playerId && !this.isHost) {
+                this.isHost = true;
+                this.addMessage('', '방장 권한을 받았습니다.', 'system');
+                this.updateHostUI();
+            }
+            this.renderUsers(this.users);
+        });
+
+        this.network.on('disconnected', () => {
+            if (this.currentRoomId) {
+                this.showWelcomeState();
+                this.fetchAndRenderRooms();
+                this.startRoomListRefresh();
+                this.connectToLobbyChat();
+                this.showToast('서버와의 연결이 끊어졌습니다.');
+            }
+        });
+    }
+
+    // ─────────────────── Event Listeners ───────────────────
+
+    setupEventListeners() {
+        // Setup modal
+        document.getElementById('btn-setup-start').addEventListener('click', () => this.handleSetupSubmit());
+        document.getElementById('setup-name').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') this.handleSetupSubmit();
+        });
+
+        // New room
+        document.getElementById('btn-new-room').addEventListener('click', () => this.openCreateModal());
+        document.getElementById('btn-welcome-create').addEventListener('click', () => this.openCreateModal());
+
+        // Create modal - room type toggle
+        document.querySelectorAll('.room-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.room-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const isPvt = btn.dataset.type === 'private';
+                document.getElementById('password-group').style.display = isPvt ? '' : 'none';
+                if (isPvt) document.getElementById('create-password').focus();
+            });
+        });
+
+        // Capacity slider
+        document.getElementById('create-capacity').addEventListener('input', (e) => {
+            document.getElementById('capacity-display').textContent = e.target.value + '명';
+        });
+
+        document.getElementById('btn-create-cancel').addEventListener('click', () => this.closeCreateModal());
+        document.getElementById('btn-create-confirm').addEventListener('click', () => this.handleCreateRoom());
+        document.getElementById('create-room-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) this.closeCreateModal();
+        });
+
+        // Password modal
+        document.getElementById('btn-pw-cancel').addEventListener('click', () => this.closePasswordModal());
+        document.getElementById('btn-pw-confirm').addEventListener('click', () => this.handlePasswordJoin());
+        document.getElementById('join-password').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') this.handlePasswordJoin();
+        });
+        document.getElementById('password-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) this.closePasswordModal();
+        });
+
+        // Leave room
+        document.getElementById('btn-leave').addEventListener('click', () => {
+            if (confirm('채팅방을 나가시겠습니까?')) this.leaveRoom();
+        });
+
+        // Room chat
+        document.getElementById('btn-send').addEventListener('click', () => this.sendMessage());
+        document.getElementById('msg-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendMessage(); }
+        });
+
+        // Lobby chat
+        document.getElementById('btn-lobby-send').addEventListener('click', () => this.sendLobbyMessage());
+        document.getElementById('lobby-msg-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendLobbyMessage(); }
+        });
+
+        // Invite
+        document.getElementById('btn-copy-invite').addEventListener('click', () => {
+            const link = this.generateInviteLink();
+            navigator.clipboard?.writeText(link).then(() => {
+                this.showToast('초대 링크가 클립보드에 복사되었습니다.');
+            }).catch(() => {
+                prompt('초대 링크 (복사해서 공유하세요):', link);
+            });
+        });
+
+        // Settings panel
+        document.getElementById('btn-settings').addEventListener('click', () => {
+            document.getElementById('settings-panel').classList.toggle('open');
+        });
+        document.getElementById('btn-settings-close').addEventListener('click', () => {
+            document.getElementById('settings-panel').classList.remove('open');
+        });
+
+        // Opacity slider
+        document.getElementById('opacity-slider').addEventListener('input', (e) => {
+            this.opacity = parseInt(e.target.value) / 100;
+            document.getElementById('opacity-value').textContent = e.target.value + '%';
+            document.documentElement.style.setProperty('--app-opacity', this.opacity);
+            localStorage.setItem('wc_opacity', this.opacity);
+        });
+
+        // Name change
+        document.getElementById('btn-name-save').addEventListener('click', () => this.handleNameSave());
+        document.getElementById('settings-name').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') this.handleNameSave();
+        });
+
+        // Mobile navigation
+        document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.view;
+                if ((view === 'chat' || view === 'members') && !this.currentRoomId) {
+                    this.showToast('채팅방에 먼저 입장해주세요.');
+                    return;
+                }
+                this.setMobileView(view);
+            });
+        });
+
+        document.getElementById('chat-back-btn')?.addEventListener('click', () => {
+            this.setMobileView('rooms');
+        });
+
+        document.getElementById('btn-toggle-members')?.addEventListener('click', () => {
+            document.getElementById('users-panel').classList.toggle('visible');
+        });
+    }
+
+    // ─────────────────── Modal Handlers ───────────────────
+
+    handleSetupSubmit() {
+        const input = document.getElementById('setup-name');
+        const name = input.value.trim();
+        if (!name) { this.showToast('닉네임을 입력해주세요.'); input.focus(); return; }
+        if (name.length < 2) { this.showToast('닉네임은 2자 이상이어야 합니다.'); input.focus(); return; }
+
+        this.nickname = name;
+        localStorage.setItem('wc_nickname', name);
+        this.hideSetupModal();
+
+        const pendingRoom = sessionStorage.getItem('wc_pending_room');
+        const pendingPw = sessionStorage.getItem('wc_pending_pw');
+        sessionStorage.removeItem('wc_pending_room');
+        sessionStorage.removeItem('wc_pending_pw');
+
+        this.showLobby();
+        if (pendingRoom) this.doJoinRoom(pendingRoom, pendingPw || null);
+    }
+
+    openCreateModal() {
+        if (!this.nickname) { this.showSetupModal(); return; }
+        document.getElementById('create-room-name').value = '';
+        document.getElementById('create-room-topic').value = '';
+        document.getElementById('create-password').value = '';
+        document.getElementById('create-capacity').value = MAX_PLAYERS_DEFAULT;
+        document.getElementById('capacity-display').textContent = MAX_PLAYERS_DEFAULT + '명';
+        document.querySelectorAll('.room-type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.room-type-btn[data-type="public"]').classList.add('active');
+        document.getElementById('password-group').style.display = 'none';
+        document.getElementById('create-room-modal').classList.add('active');
+        setTimeout(() => document.getElementById('create-room-name').focus(), 100);
+    }
+
+    closeCreateModal() {
+        document.getElementById('create-room-modal').classList.remove('active');
+    }
+
+    handleCreateRoom() {
+        const name = document.getElementById('create-room-name').value.trim();
+        if (!name) { this.showToast('방 이름을 입력해주세요.'); document.getElementById('create-room-name').focus(); return; }
+
+        const topic = document.getElementById('create-room-topic').value.trim();
+        const maxPlayers = parseInt(document.getElementById('create-capacity').value) || MAX_PLAYERS_DEFAULT;
+
+        const isPrivate = document.querySelector('.room-type-btn.active')?.dataset.type === 'private';
+        let password = null;
+        if (isPrivate) {
+            password = document.getElementById('create-password').value.trim();
+            if (!password || !/^\d{4}$/.test(password)) {
+                this.showToast('비밀번호는 숫자 4자리로 입력해주세요.');
+                document.getElementById('create-password').focus();
+                return;
+            }
+        }
+
+        this.closeCreateModal();
+        this.createRoom(name, topic, password, maxPlayers);
+    }
+
+    closePasswordModal() {
+        document.getElementById('password-modal').classList.remove('active');
+        this.pendingJoinRoom = null;
+    }
+
+    handlePasswordJoin() {
+        const pw = document.getElementById('join-password').value.trim();
+        if (!pw || !/^\d{4}$/.test(pw)) { this.showToast('숫자 4자리를 입력해주세요.'); return; }
+        if (!this.pendingJoinRoom) return;
+
+        const room = this.pendingJoinRoom;
+        this.closePasswordModal();
+        this.doJoinRoom(room.roomId, pw);
+    }
+
+    handleNameSave() {
+        const newName = document.getElementById('settings-name').value.trim();
+        if (!newName) { this.showToast('닉네임을 입력해주세요.'); return; }
+        if (newName.length < 2) { this.showToast('닉네임은 2자 이상이어야 합니다.'); return; }
+
+        this.nickname = newName;
+        localStorage.setItem('wc_nickname', newName);
+        document.getElementById('my-name-display').textContent = newName;
+        this.updateAvatar(newName);
+        this.showToast('닉네임이 변경되었습니다. 다음 입장부터 적용됩니다.');
+    }
+
+    // ─────────────────── Utilities ───────────────────
+
+    escapeHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = String(str || '');
+        return d.innerHTML;
+    }
+
+    showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(this._toastTimer);
+        this._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new WorkChat();
+});
