@@ -521,7 +521,7 @@ class WorkChat {
             return;
         }
         if (!confirm(`${targetUser.name}님에게 1:1 DM을 시작하시겠습니까?`)) return;
-        const dmPassword = String(Math.floor(1000 + Math.random() * 9000));
+        const dmPassword = String(crypto.getRandomValues(new Uint16Array(1))[0]).slice(-4).padStart(4, '0');
         const dmRoomName = `DM: ${this.nickname} ↔ ${targetUser.name}`;
         // Resolve lobbyNet id for the target
         const lobbyUser = this.lobbyUsers.find(lu => lu.name === targetUser.name) || targetUser;
@@ -796,6 +796,10 @@ class WorkChat {
         const input = document.getElementById('msg-input');
         const text = input.value.trim();
         if (!text || !this.currentRoomId) return;
+        if (!this.network.connected) {
+            this.showToast('서버 연결이 끊어졌습니다.');
+            return;
+        }
         const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         this.network.send({ type: 'chat', message: text.slice(0, 500), msgId });
         this._typingDebounce = null;
@@ -950,7 +954,9 @@ class WorkChat {
         `;
         document.body.appendChild(d);
 
+        const autoCloseTimer = setTimeout(() => d.remove(), 30000);
         document.getElementById('btn-invite-accept').addEventListener('click', () => {
+            clearTimeout(autoCloseTimer);
             d.remove();
             if (this.currentRoomId) {
                 this.network.leaveRoom();
@@ -959,8 +965,10 @@ class WorkChat {
             }
             this.doJoinRoom(roomId, password);
         });
-        document.getElementById('btn-invite-decline').addEventListener('click', () => d.remove());
-        setTimeout(() => d.remove(), 30000);
+        document.getElementById('btn-invite-decline').addEventListener('click', () => {
+            clearTimeout(autoCloseTimer);
+            d.remove();
+        });
     }
 
     // ─────────────────── Host Actions ───────────────────
