@@ -7,6 +7,23 @@ const LOBBY_ROOM_ID = 'global';
 const MAX_PLAYERS_DEFAULT = 10;
 const MAX_PLAYERS_LIMIT = 100;
 
+// ─── PWA: Service Worker Registration ───
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
+// ─── PWA: Install Prompt ───
+let _pwaInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _pwaInstallPrompt = e;
+    // Show install button in settings
+    const g = document.getElementById('pwa-install-group');
+    if (g) g.style.display = '';
+});
+
 class WorkChat {
     constructor() {
         this.network = new NetworkClient('workchat');       // Regular rooms
@@ -61,6 +78,20 @@ class WorkChat {
         const value = document.getElementById('opacity-value');
         if (slider) slider.value = Math.round(this.opacity * 100);
         if (value) value.textContent = Math.round(this.opacity * 100) + '%';
+        this.syncThemeColor(this.opacity);
+    }
+
+    // theme-color 동기화: 투명도가 낮을수록 밝아짐 (투명창 효과)
+    syncThemeColor(opacity) {
+        // Sidebar base color #1a1d21 (r=26, g=29, b=33)
+        // Blend toward white as opacity decreases
+        const blend = (c) => Math.round(c + (255 - c) * (1 - opacity));
+        const r = blend(26), g = blend(29), b = blend(33);
+        const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+        const meta = document.getElementById('meta-theme-color');
+        if (meta) meta.content = hex;
+        // Also update body background to make OS window edge match
+        document.documentElement.style.setProperty('--bg-sidebar', `rgb(${r},${g},${b})`);
     }
 
     updateAvatar(name) {
@@ -792,6 +823,19 @@ class WorkChat {
             document.getElementById('opacity-value').textContent = e.target.value + '%';
             document.documentElement.style.setProperty('--app-opacity', this.opacity);
             localStorage.setItem('wc_opacity', this.opacity);
+            this.syncThemeColor(this.opacity);
+        });
+
+        // PWA install button
+        document.getElementById('btn-install-pwa')?.addEventListener('click', async () => {
+            if (!_pwaInstallPrompt) return;
+            _pwaInstallPrompt.prompt();
+            const { outcome } = await _pwaInstallPrompt.userChoice;
+            _pwaInstallPrompt = null;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-group').style.display = 'none';
+                this.showToast('앱으로 설치되었습니다! 앱을 실행하면 주소창 없이 사용할 수 있습니다.');
+            }
         });
 
         // Name change

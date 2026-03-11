@@ -1,0 +1,23 @@
+{
+    "name": "Chat",
+    "short_name": "Chat",
+    "description": "실시간 채팅 앱 - 로비 & 채팅방",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone"],
+    "background_color": "#1a1d21",
+    "theme_color": "#1a1d21",
+    "orientation": "any",
+    "lang": "ko",
+    "icons": [
+        {
+            "src": "icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "categories": ["productivity", "social"]
+}

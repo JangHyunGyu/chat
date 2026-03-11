@@ -1156,3 +1156,71 @@ button:focus-visible, input:focus-visible {
 
 .room-item.room-full:hover { background: transparent; }
 
+/* ─── PWA Installed indicator ─── */
+.pwa-ok {
+    color: var(--success) !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+/* ─── PWA Standalone mode (no address bar) ─── */
+@media (display-mode: standalone) {
+    /* No address bar - use full height */
+    body { height: 100vh; }
+
+    /* Slightly adjust for safe areas on mobile */
+    #app {
+        padding-top: env(safe-area-inset-top, 0);
+        padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .mobile-nav {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        height: calc(var(--mobile-nav-h) + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Show installed status in settings */
+    #pwa-install-group { display: none !important; }
+    #pwa-installed-group { display: block !important; }
+}
+
+/* ─── PWA Window Controls Overlay (Chromium desktop) ─── */
+@media (display-mode: window-controls-overlay) {
+    /* The title bar area is now part of the web content */
+    :root {
+        --wco-top: env(titlebar-area-y, 0px);
+        --wco-height: env(titlebar-area-height, 0px);
+    }
+
+    /* Extend sidebar into title bar space */
+    .sidebar {
+        padding-top: var(--wco-height);
+    }
+
+    .sidebar-header {
+        /* Make this area draggable (to move the window) */
+        -webkit-app-region: drag;
+        app-region: drag;
+    }
+
+    /* Interactive elements inside the drag area must opt out */
+    .sidebar-header button,
+    .sidebar-header input,
+    .sidebar-header a,
+    .my-info,
+    .brand-logo {
+        -webkit-app-region: no-drag;
+        app-region: no-drag;
+    }
+
+    /* Main area also pushed down by title bar height */
+    .main-area,
+    .users-panel {
+        padding-top: var(--wco-height);
+    }
+
+    /* Show installed status in settings */
+    #pwa-install-group { display: none !important; }
+    #pwa-installed-group { display: block !important; }
+}
+
