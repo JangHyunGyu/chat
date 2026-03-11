@@ -577,6 +577,9 @@ class WorkChat {
 
         const inviteUserBtn = document.getElementById('btn-invite-user');
         if (inviteUserBtn) inviteUserBtn.style.display = this.isHost ? '' : 'none';
+
+        const headerInviteBtn = document.getElementById('btn-header-invite-user');
+        if (headerInviteBtn) headerInviteBtn.style.display = this.isHost ? '' : 'none';
     }
 
     // ─────────────────── Invite ───────────────────
@@ -984,6 +987,7 @@ class WorkChat {
 
         // Invite user modal
         document.getElementById('btn-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
+        document.getElementById('btn-header-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
         document.getElementById('btn-invite-modal-close')?.addEventListener('click', () => {
             document.getElementById('invite-user-modal').classList.remove('active');
         });
