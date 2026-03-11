@@ -31,7 +31,7 @@ class WorkChat {
 
         // Settings
         this.nickname = localStorage.getItem('wc_nickname') || '';
-        this.opacity = parseFloat(localStorage.getItem('wc_opacity') || '1');
+        this.theme = localStorage.getItem('wc_theme') || 'dark';
 
         // Room state
         this.currentRoomId = null;
@@ -55,7 +55,7 @@ class WorkChat {
     // ─────────────────── Init ───────────────────
 
     init() {
-        this.applyOpacity();
+        this.applyTheme(this.theme);
         this.setupEventListeners();
         this.setupNetworkHandlers();
         this.setupLobbyNetworkHandlers();
@@ -72,26 +72,20 @@ class WorkChat {
 
     // ─────────────────── Settings ───────────────────
 
-    applyOpacity() {
-        document.documentElement.style.setProperty('--app-opacity', this.opacity);
-        const slider = document.getElementById('opacity-slider');
-        const value = document.getElementById('opacity-value');
-        if (slider) slider.value = Math.round(this.opacity * 100);
-        if (value) value.textContent = Math.round(this.opacity * 100) + '%';
-        this.syncThemeColor(this.opacity);
-    }
+    applyTheme(theme) {
+        this.theme = theme;
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem('wc_theme', theme);
 
-    // theme-color 동기화: 투명도가 낮을수록 밝아짐 (투명창 효과)
-    syncThemeColor(opacity) {
-        // Sidebar base color #1a1d21 (r=26, g=29, b=33)
-        // Blend toward white as opacity decreases
-        const blend = (c) => Math.round(c + (255 - c) * (1 - opacity));
-        const r = blend(26), g = blend(29), b = blend(33);
-        const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+        // Sync PWA theme-color to sidebar color
+        const colors = { dark: '#1a1d21', light: '#e8eaed', midnight: '#0d1117' };
         const meta = document.getElementById('meta-theme-color');
-        if (meta) meta.content = hex;
-        // Also update body background to make OS window edge match
-        document.documentElement.style.setProperty('--bg-sidebar', `rgb(${r},${g},${b})`);
+        if (meta) meta.content = colors[theme] || colors.dark;
+
+        // Update active state on theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === theme);
+        });
     }
 
     updateAvatar(name) {
@@ -843,13 +837,9 @@ class WorkChat {
             document.getElementById('settings-panel').classList.remove('open');
         });
 
-        // Opacity slider
-        document.getElementById('opacity-slider').addEventListener('input', (e) => {
-            this.opacity = parseInt(e.target.value) / 100;
-            document.getElementById('opacity-value').textContent = e.target.value + '%';
-            document.documentElement.style.setProperty('--app-opacity', this.opacity);
-            localStorage.setItem('wc_opacity', this.opacity);
-            this.syncThemeColor(this.opacity);
+        // Theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.applyTheme(btn.dataset.theme));
         });
 
         // PWA install button

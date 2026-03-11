@@ -33,7 +33,6 @@
     --shadow-lg: 0 8px 32px rgba(0,0,0,0.18);
     --radius: 8px;
     --radius-sm: 4px;
-    --app-opacity: 1;
     --mobile-nav-h: 56px;
     --chat-header-h: 52px;
     --input-area-h: 68px;
@@ -42,14 +41,57 @@
 /* ─── Reset & Base ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ─── Light Theme ─── */
+[data-theme="light"] {
+    --bg-sidebar: #e8eaed;
+    --bg-sidebar-hover: #dadde1;
+    --bg-sidebar-active: #c8ccd0;
+    --bg-main: #ffffff;
+    --bg-secondary: #f5f6f7;
+    --bg-input: #ebedf0;
+    --text-sidebar: #1c1e21;
+    --text-sidebar-muted: #606770;
+    --text-sidebar-active: #1c1e21;
+    --border-dark: #dadde1;
+}
+
+/* ─── Midnight Theme ─── */
+[data-theme="midnight"] {
+    --bg-sidebar: #0d1117;
+    --bg-sidebar-hover: #161b22;
+    --bg-sidebar-active: #21262d;
+    --bg-main: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-input: #21262d;
+    --bg-modal: rgba(0,0,0,0.8);
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-system: #6e7681;
+    --border: #30363d;
+    --border-dark: #21262d;
+    --msg-self-bg: #1e2d40;
+    --accent-light: #1e2d40;
+}
+
+[data-theme="midnight"] #msg-input:focus,
+[data-theme="midnight"] #lobby-msg-input:focus,
+[data-theme="midnight"] .modal-input:focus {
+    background: #161b22;
+}
+
+[data-theme="midnight"] .modal-box,
+[data-theme="midnight"] .settings-panel {
+    background: #161b22;
+    border-color: #30363d;
+}
+
 html, body {
     height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
     font-size: 14px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    opacity: var(--app-opacity);
-    transition: opacity 0.2s;
+    transition: background 0.2s, color 0.2s;
     overflow: hidden;
 }
 
@@ -488,7 +530,7 @@ a { color: var(--accent); text-decoration: none; }
     flex-shrink: 0;
 }
 
-#msg-input {
+#msg-input, #lobby-msg-input {
     flex: 1;
     background: var(--bg-input);
     border-radius: var(--radius);
@@ -498,12 +540,12 @@ a { color: var(--accent); text-decoration: none; }
     transition: box-shadow 0.15s;
 }
 
-#msg-input:focus {
+#msg-input:focus, #lobby-msg-input:focus {
     box-shadow: 0 0 0 2px var(--accent);
     background: #fff;
 }
 
-#msg-input::placeholder { color: var(--text-system); }
+#msg-input::placeholder, #lobby-msg-input::placeholder { color: var(--text-system); }
 
 .btn-send {
     background: var(--accent);
@@ -880,20 +922,47 @@ a { color: var(--accent); text-decoration: none; }
 
 .btn-sm:hover { background: var(--accent-hover); }
 
-.opacity-label {
+/* ─── Theme Selector ─── */
+.theme-group {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 10px;
+    gap: 8px;
 }
 
-#opacity-value {
-    font-size: 13px;
-    font-weight: 700;
+.theme-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.theme-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-light);
     color: var(--accent);
 }
+
+.theme-swatch {
+    width: 36px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.theme-swatch-dark   { background: linear-gradient(to right, #1a1d21 50%, #ffffff 50%); }
+.theme-swatch-light  { background: linear-gradient(to right, #e8eaed 50%, #ffffff 50%); }
+.theme-swatch-midnight { background: linear-gradient(to right, #0d1117 50%, #161b22 50%); }
 
 input[type="range"] {
     width: 100%;
