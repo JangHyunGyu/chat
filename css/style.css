@@ -435,6 +435,22 @@ a { color: var(--accent); text-decoration: none; }
     flex-shrink: 0;
 }
 
+.btn-header-invite {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.btn-header-invite:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
 .btn-leave-room {
     background: transparent;
     color: var(--danger, #ef4444);
