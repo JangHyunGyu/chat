@@ -91,7 +91,8 @@ html, body {
     font-size: 14px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    transition: background 0.2s, color 0.2s;
+    opacity: var(--app-opacity, 1);
+    transition: background 0.2s, color 0.2s, opacity 0.15s;
     overflow: hidden;
 }
 
@@ -963,6 +964,22 @@ a { color: var(--accent); text-decoration: none; }
 .theme-swatch-dark   { background: linear-gradient(to right, #1a1d21 50%, #ffffff 50%); }
 .theme-swatch-light  { background: linear-gradient(to right, #e8eaed 50%, #ffffff 50%); }
 .theme-swatch-midnight { background: linear-gradient(to right, #0d1117 50%, #161b22 50%); }
+
+/* ─── Opacity ─── */
+.opacity-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+#opacity-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+}
 
 input[type="range"] {
     width: 100%;

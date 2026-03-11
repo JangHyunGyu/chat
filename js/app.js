@@ -32,6 +32,7 @@ class WorkChat {
         // Settings
         this.nickname = localStorage.getItem('wc_nickname') || '';
         this.theme = localStorage.getItem('wc_theme') || 'dark';
+        this.opacity = parseFloat(localStorage.getItem('wc_opacity') || '1');
 
         // Room state
         this.currentRoomId = null;
@@ -56,6 +57,7 @@ class WorkChat {
 
     init() {
         this.applyTheme(this.theme);
+        this.applyOpacity(this.opacity);
         this.setupEventListeners();
         this.setupNetworkHandlers();
         this.setupLobbyNetworkHandlers();
@@ -86,6 +88,17 @@ class WorkChat {
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.theme === theme);
         });
+    }
+
+    applyOpacity(val) {
+        this.opacity = val;
+        document.documentElement.style.setProperty('--app-opacity', val);
+        localStorage.setItem('wc_opacity', val);
+        const pct = Math.round(val * 100);
+        const slider = document.getElementById('opacity-slider');
+        const display = document.getElementById('opacity-value');
+        if (slider) slider.value = pct;
+        if (display) display.textContent = pct + '%';
     }
 
     updateAvatar(name) {
@@ -840,6 +853,11 @@ class WorkChat {
         // Theme buttons
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.addEventListener('click', () => this.applyTheme(btn.dataset.theme));
+        });
+
+        // Opacity slider
+        document.getElementById('opacity-slider')?.addEventListener('input', (e) => {
+            this.applyOpacity(parseInt(e.target.value) / 100);
         });
 
         // PWA install button
