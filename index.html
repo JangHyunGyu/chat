@@ -42,6 +42,7 @@
         <div class="sidebar-header">
             <div class="sidebar-brand">
                 <span class="brand-logo">Chat</span>
+                <span id="lobby-unread-badge" class="unread-badge" style="display:none">0</span>
             </div>
             <div class="my-info">
                 <div class="my-avatar" id="my-avatar">?</div>
@@ -107,12 +108,17 @@
                 </div>
                 <div class="chat-header-right">
                     <button id="btn-header-invite-user" class="btn-header-invite" style="display:none" title="사용자 초대">👤 초대</button>
+                    <button id="btn-pin-message" class="btn-icon" style="display:none" title="공지 등록">📌</button>
                     <button id="btn-toggle-members" class="btn-icon" title="참여자 목록">👥</button>
                     <button id="btn-leave" class="btn-leave-room" title="방 나가기">방 나가기</button>
                 </div>
             </div>
 
+            <div id="pinned-message" class="pinned-message" style="display:none"></div>
+
             <div id="messages" class="messages-area"></div>
+
+            <div id="typing-indicator" class="typing-indicator" style="display:none"></div>
 
             <div class="input-area">
                 <input
@@ -239,6 +245,11 @@
             </div>
             <input type="range" id="opacity-slider" min="10" max="100" value="100">
             <p class="setting-hint">낮출수록 화면이 투명해집니다. (뒤 창이 비쳐 보임)</p>
+        </div>
+        <div class="setting-group" id="notif-permission-group">
+            <h4>알림</h4>
+            <button id="btn-notif-permission" class="btn-block" style="margin-top:0">🔔 브라우저 알림 허용</button>
+            <p class="setting-hint">멘션이나 초대를 받을 때 알림을 표시합니다.</p>
         </div>
         <div class="setting-group" id="pwa-install-group" style="display:none">
             <h4>앱 설치</h4>

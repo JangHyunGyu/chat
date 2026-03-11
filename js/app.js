@@ -50,6 +50,22 @@ class WorkChat {
         this.roomListTimer = null;
         this.pendingJoinRoom = null;
 
+        // Typing indicator
+        this.typingUsers = {};
+        this._typingDebounce = null;
+
+        // Unread lobby badge
+        this.unreadLobby = 0;
+
+        // Pinned message
+        this.pinnedMessage = null;
+
+        // Emoji reactions
+        this.reactions = {};
+
+        // DM pending invite
+        this._pendingDMInvite = null;
+
         this.init();
     }
 
@@ -61,6 +77,12 @@ class WorkChat {
         this.setupEventListeners();
         this.setupNetworkHandlers();
         this.setupLobbyNetworkHandlers();
+
+        // Hide notification permission button if already granted or not supported
+        if (!('Notification' in window) || Notification.permission === 'granted') {
+            const g = document.getElementById('notif-permission-group');
+            if (g) g.style.display = 'none';
+        }
 
         const inviteHandled = this.handleInviteUrl();
         if (!inviteHandled) {
@@ -145,6 +167,8 @@ class WorkChat {
         this.isHost = false;
         this.displayHostId = null;
         this.users = [];
+        this.unreadLobby = 0;
+        this.updateLobbyBadge();
     }
 
     showChatState(roomName, topic, isPrivate) {
@@ -157,7 +181,18 @@ class WorkChat {
         document.getElementById('room-lock-icon').textContent = isPrivate ? '🔒' : '';
 
         const topicEl = document.getElementById('current-room-topic');
-        if (topicEl) topicEl.textContent = topic ? ` · ${topic}` : '';
+        if (topicEl) {
+            topicEl.textContent = topic ? ` · ${topic}` : '';
+            topicEl.className = this.isHost ? 'room-topic-display room-topic-host' : 'room-topic-display';
+            topicEl.title = this.isHost ? '클릭하여 주제 변경' : '';
+        }
+
+        // Reset typing indicator
+        this.typingUsers = {};
+        this.updateTypingDisplay();
+
+        // Reset pinned message
+        this.setPinnedMessage(null);
 
         this.clearMessages();
         this.updateRoomInfoPanel();
@@ -275,6 +310,225 @@ class WorkChat {
         this.updateLobbyCount();
     }
 
+    // ─────────────────── Nickname Colors ───────────────────
+
+    nicknameColor(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h = Math.abs(hash) % 360;
+        return `hsl(${h}, 60%, 45%)`;
+    }
+
+    // ─────────────────── Mention Rendering ───────────────────
+
+    renderMentions(text) {
+        const escaped = this.escapeHtml(text);
+        return escaped.replace(/@(\S+)/g, (match, word) => {
+            const isMe = word === this.nickname || this.escapeHtml(word) === this.escapeHtml(this.nickname);
+            const cls = isMe ? 'mention mention-me' : 'mention';
+            return `<span class="${cls}">@${this.escapeHtml(word)}</span>`;
+        });
+    }
+
+    // ─────────────────── Typing Indicator ───────────────────
+
+    sendTypingIndicator() {
+        if (!this.currentRoomId || this._typingDebounce) return;
+        this.network.send({ type: 'typing', name: this.nickname });
+        this._typingDebounce = setTimeout(() => { this._typingDebounce = null; }, 2000);
+    }
+
+    showTypingIndicator(name) {
+        if (this.typingUsers[name]) clearTimeout(this.typingUsers[name]);
+        this.typingUsers[name] = setTimeout(() => {
+            delete this.typingUsers[name];
+            this.updateTypingDisplay();
+        }, 3000);
+        this.updateTypingDisplay();
+    }
+
+    updateTypingDisplay() {
+        const el = document.getElementById('typing-indicator');
+        if (!el) return;
+        const names = Object.keys(this.typingUsers);
+        if (names.length === 0) {
+            el.style.display = 'none';
+            el.textContent = '';
+        } else {
+            el.style.display = '';
+            el.textContent = names.join(', ') + '님이 입력 중...';
+        }
+    }
+
+    // ─────────────────── Unread Lobby Badge ───────────────────
+
+    updateLobbyBadge() {
+        const el = document.getElementById('lobby-unread-badge');
+        if (!el) return;
+        if (this.unreadLobby > 0) {
+            el.textContent = this.unreadLobby;
+            el.style.display = '';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+
+    // ─────────────────── Pinned Message ───────────────────
+
+    setPinnedMessage(text) {
+        this.pinnedMessage = text || null;
+        const el = document.getElementById('pinned-message');
+        if (!el) return;
+        if (this.pinnedMessage) {
+            el.textContent = '📌 ' + this.pinnedMessage;
+            el.style.display = '';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+
+    pinCurrentMessage(text) {
+        if (!this.isHost) return;
+        this.network.send({ type: 'pinMessage', text });
+        this.setPinnedMessage(text);
+    }
+
+    // ─────────────────── Topic Change ───────────────────
+
+    changeTopicInline() {
+        if (!this.isHost) return;
+        const newTopic = prompt('새 주제를 입력하세요:', this.currentRoomTopic || '');
+        if (newTopic === null) return;
+        const topic = newTopic.trim().slice(0, 60);
+        this.currentRoomTopic = topic;
+        this.network.send({ type: 'topicChange', topic });
+        this.network.setMetadata({
+            roomName: this.currentRoomName,
+            topic,
+            password: !!this.currentPassword,
+            maxPlayers: this.maxPlayers,
+        });
+        const topicEl = document.getElementById('current-room-topic');
+        if (topicEl) topicEl.textContent = topic ? ` · ${topic}` : '';
+        this.updateRoomInfoPanel();
+    }
+
+    // ─────────────────── Emoji Reactions ───────────────────
+
+    showReactionBar(msgEl, msgId) {
+        const existing = msgEl.querySelector('.reaction-bar');
+        if (existing) return;
+        const bar = document.createElement('div');
+        bar.className = 'reaction-bar';
+        const emojis = ['👍', '❤️', '😂', '😮', '😢', '🔥'];
+        for (const emoji of emojis) {
+            const btn = document.createElement('button');
+            btn.className = 'reaction-pick';
+            btn.textContent = emoji;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.sendReaction(msgId, emoji);
+                bar.remove();
+            });
+            bar.appendChild(btn);
+        }
+        bar.addEventListener('mouseleave', () => bar.remove());
+        msgEl.appendChild(bar);
+    }
+
+    sendReaction(msgId, emoji) {
+        this.network.send({ type: 'reaction', msgId, emoji, name: this.nickname });
+        this.applyReaction(msgId, emoji, this.nickname);
+    }
+
+    applyReaction(msgId, emoji, name) {
+        if (!this.reactions[msgId]) this.reactions[msgId] = {};
+        if (!this.reactions[msgId][emoji]) this.reactions[msgId][emoji] = new Set();
+        this.reactions[msgId][emoji].add(name);
+        this.renderReactions(msgId);
+    }
+
+    renderReactions(msgId) {
+        const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
+        if (!msgEl) return;
+        const container = msgEl.querySelector('.msg-reactions');
+        if (!container) return;
+        container.innerHTML = '';
+        const emojiMap = this.reactions[msgId] || {};
+        for (const [emoji, names] of Object.entries(emojiMap)) {
+            if (names.size === 0) continue;
+            const badge = document.createElement('button');
+            badge.className = 'reaction-badge' + (names.has(this.nickname) ? ' me' : '');
+            badge.textContent = `${emoji} ${names.size}`;
+            badge.title = [...names].join(', ');
+            badge.addEventListener('click', () => this.sendReaction(msgId, emoji));
+            container.appendChild(badge);
+        }
+    }
+
+    // ─────────────────── Push Notifications ───────────────────
+
+    requestNotificationPermission() {
+        if (!('Notification' in window)) {
+            this.showToast('이 브라우저는 알림을 지원하지 않습니다.');
+            return;
+        }
+        Notification.requestPermission().then(result => {
+            if (result === 'granted') {
+                this.showToast('알림이 허용되었습니다.');
+                const btn = document.getElementById('btn-notif-permission');
+                if (btn) btn.closest('.setting-group').style.display = 'none';
+            } else if (result === 'denied') {
+                this.showToast('알림이 차단되었습니다. 브라우저 설정에서 변경할 수 있습니다.');
+            } else {
+                this.showToast('알림 권한이 설정되지 않았습니다.');
+            }
+        });
+    }
+
+    showBrowserNotification(title, body) {
+        if (!document.hidden) return;
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+        try {
+            new Notification(title, { body, icon: '/icons/icon.svg' });
+        } catch {}
+    }
+
+    playMentionSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        } catch {}
+    }
+
+    // ─────────────────── DM ───────────────────
+
+    startDM(targetUser) {
+        if (!this.lobbyNet.connected) {
+            this.showToast('로비에 연결되어 있어야 DM을 보낼 수 있습니다.');
+            return;
+        }
+        if (!confirm(`${targetUser.name}님에게 1:1 DM을 시작하시겠습니까?`)) return;
+        const dmPassword = String(Math.floor(1000 + Math.random() * 9000));
+        const dmRoomName = `DM: ${this.nickname} ↔ ${targetUser.name}`;
+        // Resolve lobbyNet id for the target
+        const lobbyUser = this.lobbyUsers.find(lu => lu.name === targetUser.name) || targetUser;
+        this._pendingDMInvite = { targetId: lobbyUser.id, targetName: targetUser.name, password: dmPassword };
+        this.createRoom(dmRoomName, '', dmPassword, 2);
+    }
+
     addLobbyMessage(name, text, type = 'chat') {
         const el = document.getElementById('lobby-messages');
         if (!el) return;
@@ -288,12 +542,13 @@ class WorkChat {
             msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
             const now = new Date();
             const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const color = this.nicknameColor(name);
             msg.innerHTML = `
                 <div class="msg-header">
-                    <span class="msg-name">${this.escapeHtml(name)}</span>
+                    <span class="msg-name" style="color:${color}">${this.escapeHtml(name)}</span>
                     <span class="msg-time">${time}</span>
                 </div>
-                <div class="msg-text">${this.escapeHtml(text)}</div>
+                <div class="msg-text">${this.renderMentions(text)}</div>
             `;
         }
 
@@ -323,14 +578,22 @@ class WorkChat {
         el.innerHTML = '';
         for (const u of this.lobbyUsers) {
             const isMe = u.id === this.lobbyNet.playerId;
+            const color = this.nicknameColor(u.name);
             const item = document.createElement('div');
             item.className = `user-item${isMe ? ' me' : ''}`;
             item.innerHTML = `
                 <span class="user-avatar">👤</span>
                 <div class="user-info">
-                    <span class="user-name">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
+                    <span class="user-name" style="color:${color}">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
                 </div>
+                ${!isMe ? `<button class="btn-dm" title="1:1 DM">💬</button>` : ''}
             `;
+            if (!isMe) {
+                item.querySelector('.btn-dm').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.startDM(u);
+                });
+            }
             el.appendChild(item);
         }
         const countEl = document.getElementById('user-count');
@@ -369,6 +632,10 @@ class WorkChat {
 
         this.lobbyNet.on('chat', (msg) => {
             this.addLobbyMessage(msg.name, msg.message, 'chat');
+            if (this.currentRoomId) {
+                this.unreadLobby++;
+                this.updateLobbyBadge();
+            }
         });
 
         this.lobbyNet.on('roomInvite', (msg) => {
@@ -485,7 +752,7 @@ class WorkChat {
         if (el) el.innerHTML = '';
     }
 
-    addMessage(name, text, type = 'chat') {
+    addMessage(name, text, type = 'chat', msgId = null) {
         const el = document.getElementById('messages');
         if (!el) return;
 
@@ -495,16 +762,29 @@ class WorkChat {
             msg.textContent = text;
         } else {
             const isMe = name === this.nickname;
-            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
+            const mentionsMe = !isMe && text.includes('@' + this.nickname);
+            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}${mentionsMe ? ' msg-mention' : ''}`;
+            if (msgId) msg.dataset.msgId = msgId;
             const now = new Date();
             const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const color = this.nicknameColor(name);
             msg.innerHTML = `
                 <div class="msg-header">
-                    <span class="msg-name">${this.escapeHtml(name)}</span>
+                    <span class="msg-name" style="color:${color}">${this.escapeHtml(name)}</span>
                     <span class="msg-time">${time}</span>
                 </div>
-                <div class="msg-text">${this.escapeHtml(text)}</div>
+                <div class="msg-text">${this.renderMentions(text)}</div>
+                <div class="msg-reactions"></div>
             `;
+
+            if (mentionsMe) {
+                this.playMentionSound();
+                this.showBrowserNotification(name, text);
+            }
+
+            if (msgId) {
+                msg.addEventListener('mouseenter', () => this.showReactionBar(msg, msgId));
+            }
         }
 
         el.appendChild(msg);
@@ -516,7 +796,9 @@ class WorkChat {
         const input = document.getElementById('msg-input');
         const text = input.value.trim();
         if (!text || !this.currentRoomId) return;
-        this.network.sendChat(text);
+        const msgId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        this.network.send({ type: 'chat', message: text.slice(0, 500), msgId });
+        this._typingDebounce = null;
         input.value = '';
         input.focus();
     }
@@ -532,13 +814,14 @@ class WorkChat {
         for (const u of users) {
             const isDisplayHost = u.id === this.displayHostId || u.isHost;
             const isMe = u.id === this.network.playerId;
+            const color = this.nicknameColor(u.name);
 
             const item = document.createElement('div');
             item.className = `user-item${isMe ? ' me' : ''}`;
 
-            let actions = '';
+            let hostActions = '';
             if (this.isHost && !isMe) {
-                actions = `
+                hostActions = `
                     <div class="user-actions">
                         <button class="btn-user-action btn-transfer" data-id="${u.id}" title="방장 넘기기">👑</button>
                         <button class="btn-user-action btn-kick" data-id="${u.id}" title="내보내기">✕</button>
@@ -549,11 +832,19 @@ class WorkChat {
             item.innerHTML = `
                 <span class="user-avatar">${isDisplayHost ? '👑' : '👤'}</span>
                 <div class="user-info">
-                    <span class="user-name">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
+                    <span class="user-name" style="color:${color}">${this.escapeHtml(u.name)}${isMe ? ' (나)' : ''}</span>
                     ${isDisplayHost ? '<span class="user-role">방장</span>' : ''}
                 </div>
-                ${actions}
+                ${!isMe ? `<button class="btn-dm" title="1:1 DM">💬</button>` : ''}
+                ${hostActions}
             `;
+
+            if (!isMe) {
+                item.querySelector('.btn-dm').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.startDM(u);
+                });
+            }
 
             if (this.isHost && !isMe) {
                 item.querySelector('.btn-kick')?.addEventListener('click', (e) => {
@@ -580,6 +871,16 @@ class WorkChat {
 
         const headerInviteBtn = document.getElementById('btn-header-invite-user');
         if (headerInviteBtn) headerInviteBtn.style.display = this.isHost ? '' : 'none';
+
+        const pinBtn = document.getElementById('btn-pin-message');
+        if (pinBtn) pinBtn.style.display = this.isHost ? '' : 'none';
+
+        // Update topic clickability when host status changes
+        const topicEl = document.getElementById('current-room-topic');
+        if (topicEl) {
+            topicEl.className = this.isHost ? 'room-topic-display room-topic-host' : 'room-topic-display';
+            topicEl.title = this.isHost ? '클릭하여 주제 변경' : '';
+        }
     }
 
     // ─────────────────── Invite ───────────────────
@@ -737,6 +1038,20 @@ class WorkChat {
             this.renderUsers(msg.players || []);
             this.addMessage('', `${this.currentRoomName}을(를) 개설했습니다.`, 'system');
             this.fetchAndRenderRooms();
+
+            if (this._pendingDMInvite) {
+                const { targetId, targetName, password } = this._pendingDMInvite;
+                this._pendingDMInvite = null;
+                this.lobbyNet.send({
+                    type: 'roomInvite',
+                    targetId,
+                    fromName: this.nickname,
+                    roomId: this.currentRoomId,
+                    roomName: this.currentRoomName,
+                    password,
+                });
+                this.addMessage('', `${targetName}님에게 DM 초대를 보냈습니다.`, 'system');
+            }
         });
 
         this.network.on('joined', (msg) => {
@@ -820,7 +1135,28 @@ class WorkChat {
         });
 
         this.network.on('chat', (msg) => {
-            this.addMessage(msg.name, msg.message, 'chat');
+            this.addMessage(msg.name, msg.message, 'chat', msg.msgId || null);
+        });
+
+        this.network.on('typing', (msg) => {
+            if (msg.name !== this.nickname) this.showTypingIndicator(msg.name);
+        });
+
+        this.network.on('topicChange', (msg) => {
+            this.currentRoomTopic = msg.topic;
+            const topicEl = document.getElementById('current-room-topic');
+            if (topicEl) topicEl.textContent = msg.topic ? ` · ${msg.topic}` : '';
+            this.updateRoomInfoPanel();
+            this.addMessage('', '주제가 변경되었습니다: ' + msg.topic, 'system');
+        });
+
+        this.network.on('pinMessage', (msg) => {
+            this.setPinnedMessage(msg.text);
+            this.addMessage('', '📌 공지가 등록되었습니다.', 'system');
+        });
+
+        this.network.on('reaction', (msg) => {
+            this.applyReaction(msg.msgId, msg.emoji, msg.name);
         });
 
         this.network.on('kicked', () => {
@@ -911,6 +1247,23 @@ class WorkChat {
         document.getElementById('btn-send').addEventListener('click', () => this.sendMessage());
         document.getElementById('msg-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendMessage(); }
+            else this.sendTypingIndicator();
+        });
+
+        // Topic change (host)
+        document.getElementById('current-room-topic')?.addEventListener('click', () => {
+            if (this.isHost) this.changeTopicInline();
+        });
+
+        // Pin message button
+        document.getElementById('btn-pin-message')?.addEventListener('click', () => {
+            const text = prompt('공지 메시지를 입력하세요:');
+            if (text && text.trim()) this.pinCurrentMessage(text.trim().slice(0, 200));
+        });
+
+        // Notification permission button
+        document.getElementById('btn-notif-permission')?.addEventListener('click', () => {
+            this.requestNotificationPermission();
         });
 
         // Lobby chat
