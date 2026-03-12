@@ -605,12 +605,16 @@ class WorkChat {
             this.lobbyUsers = msg.players || [];
             this.updateLobbyCount();
             this.addLobbyMessage('', '로비에 연결되었습니다.', 'system');
+            this.addLobbyMessage('', '첫 번째 사용자입니다! 채팅방을 만들거나 로비에서 대화를 시작해보세요.', 'system');
         });
 
         this.lobbyNet.on('joined', (msg) => {
             this.lobbyUsers = msg.players || [];
             this.updateLobbyCount();
             this.addLobbyMessage('', '로비에 연결되었습니다.', 'system');
+            if (this.lobbyUsers.length <= 1) {
+                this.addLobbyMessage('', '현재 로비에 다른 사용자가 없습니다. 채팅방을 만들거나 기다려보세요.', 'system');
+            }
         });
 
         this.lobbyNet.on('playerJoined', (msg) => {
