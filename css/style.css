@@ -85,6 +85,281 @@
     border-color: #30363d;
 }
 
+/* ─── VSCode Theme ─── */
+[data-theme="vscode"] {
+    --bg-sidebar: #252526;
+    --bg-sidebar-hover: #2a2d2e;
+    --bg-sidebar-active: #37373d;
+    --bg-main: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-input: #3c3c3c;
+    --bg-modal: rgba(0, 0, 0, 0.7);
+    --accent: #007acc;
+    --accent-hover: #1a8ad4;
+    --accent-light: #1e3a5f;
+    --text-primary: #cccccc;
+    --text-secondary: #858585;
+    --text-sidebar: #cccccc;
+    --text-sidebar-muted: #858585;
+    --text-sidebar-active: #ffffff;
+    --text-system: #6a6a6a;
+    --border: #3c3c3c;
+    --border-dark: #3c3c3c;
+    --msg-self-bg: #264f78;
+    --danger: #f14c4c;
+    --danger-hover: #d73a3a;
+    --success: #89d185;
+}
+[data-theme="vscode"] #msg-input:focus,
+[data-theme="vscode"] #lobby-msg-input:focus,
+[data-theme="vscode"] .modal-input:focus {
+    background: #1e1e1e;
+}
+[data-theme="vscode"] .modal-box,
+[data-theme="vscode"] .settings-panel {
+    background: #252526;
+    border-color: #3c3c3c;
+}
+[data-theme="vscode"] .sidebar-header {
+    border-bottom-color: #3c3c3c;
+}
+[data-theme="vscode"] .brand-logo::before { content: "EXPLORER"; font-size: 11px; letter-spacing: 1.2px; }
+[data-theme="vscode"] .brand-logo { font-size: 0; }
+[data-theme="vscode"] .brand-badge { display: none; }
+[data-theme="vscode"] .section-label { letter-spacing: 1px; font-size: 11px; font-weight: 600; }
+[data-theme="vscode"] .lobby-title { font-size: 13px; font-weight: 400; letter-spacing: 0.3px; }
+[data-theme="vscode"] .messages-area { font-family: Consolas, 'Courier New', monospace; font-size: 13px; }
+[data-theme="vscode"] .msg-text { border-radius: 2px; font-family: Consolas, 'Courier New', monospace; font-size: 13px; }
+[data-theme="vscode"] .btn-new-room { border-radius: 2px; }
+[data-theme="vscode"] .btn-send { border-radius: 2px; }
+[data-theme="vscode"] .modal-input { border-radius: 2px; }
+[data-theme="vscode"] .modal-box { border-radius: 4px; }
+[data-theme="vscode"] .btn-primary { border-radius: 2px; }
+[data-theme="vscode"] .room-item { border-radius: 0; }
+[data-theme="vscode"] .btn-settings-sidebar { border-radius: 0; }
+[data-theme="vscode"] .input-area { border-top-color: #3c3c3c; }
+[data-theme="vscode"] .sidebar-footer { border-top-color: #3c3c3c; }
+[data-theme="vscode"] .lobby-header { border-bottom-color: #3c3c3c; }
+[data-theme="vscode"] .chat-header { border-bottom-color: #3c3c3c; }
+[data-theme="vscode"] .users-header { border-bottom-color: #3c3c3c; }
+[data-theme="vscode"] .users-panel { border-left-color: #3c3c3c; }
+[data-theme="vscode"] .mention-me { background: #3d2e00; color: #fbbf24; }
+[data-theme="vscode"] .pinned-message { background: #3d2e00; color: #fbbf24; border-color: #4d3900; }
+
+/* ─── Terminal (PuTTY) Theme ─── */
+[data-theme="terminal"] {
+    --bg-sidebar: #0a0a0a;
+    --bg-sidebar-hover: #1a1a1a;
+    --bg-sidebar-active: #222222;
+    --bg-main: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-input: #111111;
+    --bg-modal: rgba(0, 0, 0, 0.9);
+    --accent: #4ec9b0;
+    --accent-hover: #6ad8c2;
+    --accent-light: #0d2b26;
+    --text-primary: #cccccc;
+    --text-secondary: #969696;
+    --text-sidebar: #cccccc;
+    --text-sidebar-muted: #666666;
+    --text-sidebar-active: #ffffff;
+    --text-system: #555555;
+    --border: #333333;
+    --border-dark: #222222;
+    --msg-self-bg: #1a1a1a;
+    --danger: #ff3333;
+    --danger-hover: #cc0000;
+    --success: #4ec9b0;
+    --radius: 0px;
+    --radius-sm: 0px;
+}
+[data-theme="terminal"] html,
+[data-theme="terminal"] body,
+[data-theme="terminal"] * {
+    font-family: Consolas, 'Courier New', 'Liberation Mono', monospace !important;
+}
+[data-theme="terminal"] #msg-input:focus,
+[data-theme="terminal"] #lobby-msg-input:focus,
+[data-theme="terminal"] .modal-input:focus {
+    background: #0a0a0a;
+    box-shadow: 0 0 0 1px #4ec9b0;
+}
+[data-theme="terminal"] .modal-box,
+[data-theme="terminal"] .settings-panel {
+    background: #0a0a0a;
+    border-color: #333333;
+    border-radius: 0;
+}
+[data-theme="terminal"] .brand-logo::before { content: "PuTTY"; font-size: 14px; letter-spacing: 0; }
+[data-theme="terminal"] .brand-logo { font-size: 0; }
+[data-theme="terminal"] .brand-badge { display: none; }
+[data-theme="terminal"] .btn-new-room { background: #1a1a1a; color: #cccccc; border: 1px solid #444; }
+[data-theme="terminal"] .btn-new-room:hover { background: #2a2a2a; }
+[data-theme="terminal"] .btn-send { background: #1a1a1a; color: #cccccc; border: 1px solid #444; border-radius: 0; }
+[data-theme="terminal"] .btn-send:hover { background: #2a2a2a; }
+[data-theme="terminal"] .btn-primary { background: #1a1a1a; color: #cccccc; border: 1px solid #444; }
+[data-theme="terminal"] .btn-primary:hover { background: #2a2a2a; }
+[data-theme="terminal"] .btn-confirm { background: #1a1a1a; color: #cccccc; border: 1px solid #444; }
+[data-theme="terminal"] .btn-confirm:hover { background: #2a2a2a; }
+[data-theme="terminal"] .btn-block { background: #1a1a1a; color: #cccccc; border: 1px solid #444; }
+[data-theme="terminal"] .btn-block:hover { background: #2a2a2a; }
+[data-theme="terminal"] .btn-sm { background: #1a1a1a; color: #cccccc; border: 1px solid #444; }
+[data-theme="terminal"] .msg-text { border-radius: 0; }
+[data-theme="terminal"] .modal-box { border-radius: 0; }
+[data-theme="terminal"] .lobby-title { font-size: 13px; }
+[data-theme="terminal"] .lobby-title::before { content: "$ "; color: #4ec9b0; }
+[data-theme="terminal"] .msg-system { color: #555555; }
+[data-theme="terminal"] .msg-system::before { content: ">> "; }
+[data-theme="terminal"] .msg-name::before { content: "["; color: #666; }
+[data-theme="terminal"] .msg-name::after { content: "]"; color: #666; }
+[data-theme="terminal"] .my-avatar { background: #1a1a1a; color: #cccccc; border-radius: 0; border: 1px solid #444; }
+[data-theme="terminal"] #msg-input, [data-theme="terminal"] #lobby-msg-input {
+    border: 1px solid #333;
+    border-radius: 0;
+}
+[data-theme="terminal"] #msg-input::placeholder,
+[data-theme="terminal"] #lobby-msg-input::placeholder { color: #555; }
+[data-theme="terminal"] .modal-input { border-radius: 0; border: 1px solid #333; }
+[data-theme="terminal"] .section-label { color: #666; }
+[data-theme="terminal"] .room-item { border-radius: 0; }
+[data-theme="terminal"] .room-item-name::before { content: "> "; color: #666; }
+[data-theme="terminal"] .user-item { border-radius: 0; }
+[data-theme="terminal"] .user-avatar { color: #cccccc; }
+[data-theme="terminal"] .user-name { color: #cccccc; }
+[data-theme="terminal"] .toast { background: #1a1a1a; color: #cccccc; border: 1px solid #444; border-radius: 0; }
+[data-theme="terminal"] .lobby-user-count { background: #1a1a1a; color: #969696; border-radius: 0; }
+[data-theme="terminal"] #user-count { background: #1a1a1a; color: #969696; border-radius: 0; }
+[data-theme="terminal"] .mention { background: #1a2a26; color: #4ec9b0; border-radius: 0; }
+[data-theme="terminal"] .mention-me { background: #332200; color: #ffaa00; }
+[data-theme="terminal"] .pinned-message { background: #1a1a00; color: #aaaa00; border-color: #333300; }
+[data-theme="terminal"] .settings-panel { border-radius: 0; }
+[data-theme="terminal"] .theme-btn { border-radius: 0; }
+[data-theme="terminal"] .theme-swatch { border-radius: 0; }
+[data-theme="terminal"] .room-type-btn { border-radius: 0; }
+[data-theme="terminal"] .capacity-slider { accent-color: #4ec9b0; }
+[data-theme="terminal"] .btn-invite { background: #1a1a1a; color: #cccccc; border: 1px solid #444; border-radius: 0; }
+[data-theme="terminal"] ::-webkit-scrollbar-thumb { background: #333; border-radius: 0; }
+[data-theme="terminal"] .sidebar { border-right-color: #222; }
+
+/* ─── Excel Theme ─── */
+[data-theme="excel"] {
+    --bg-sidebar: #f3f3f3;
+    --bg-sidebar-hover: #e6e6e6;
+    --bg-sidebar-active: #d6d6d6;
+    --bg-main: #ffffff;
+    --bg-secondary: #f9f9f9;
+    --bg-input: #ffffff;
+    --bg-modal: rgba(0, 0, 0, 0.4);
+    --accent: #217346;
+    --accent-hover: #185c37;
+    --accent-light: #e2efda;
+    --text-primary: #1f1f1f;
+    --text-secondary: #616161;
+    --text-sidebar: #1f1f1f;
+    --text-sidebar-muted: #616161;
+    --text-sidebar-active: #1f1f1f;
+    --text-system: #8a8a8a;
+    --border: #d4d4d4;
+    --border-dark: #e0e0e0;
+    --msg-self-bg: #e2efda;
+    --danger: #c50f1f;
+    --danger-hover: #a80000;
+    --success: #217346;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+}
+[data-theme="excel"] .sidebar {
+    border-right: 1px solid #d4d4d4;
+    background: #f3f3f3;
+}
+[data-theme="excel"] .sidebar-header {
+    background: #217346;
+    border-bottom-color: #185c37;
+}
+[data-theme="excel"] .brand-logo { color: #ffffff; }
+[data-theme="excel"] .brand-logo::before { content: "Excel"; font-size: 16px; font-weight: 600; }
+[data-theme="excel"] .brand-logo { font-size: 0; }
+[data-theme="excel"] .brand-badge { background: #185c37; }
+[data-theme="excel"] .my-avatar { background: #217346; color: #fff; }
+[data-theme="excel"] #my-name-display { color: #ffffff; }
+[data-theme="excel"] .my-info { color: #ffffff; }
+[data-theme="excel"] .btn-new-room { background: #217346; border-radius: 4px; }
+[data-theme="excel"] .btn-new-room:hover { background: #185c37; }
+[data-theme="excel"] .section-label { color: #616161; font-size: 11px; letter-spacing: 0.3px; }
+[data-theme="excel"] .room-item { border-radius: 2px; }
+[data-theme="excel"] .room-item.active { background: #e2efda; }
+[data-theme="excel"] .room-item.active .room-item-name { color: #217346; }
+[data-theme="excel"] .room-item.active .room-item-icon { color: #217346; }
+[data-theme="excel"] .lobby-header {
+    background: #217346;
+    border-bottom: 1px solid #185c37;
+}
+[data-theme="excel"] .lobby-title { color: #ffffff; font-size: 13px; font-weight: 500; }
+[data-theme="excel"] .lobby-user-count { background: rgba(255,255,255,0.2); color: #ffffff; }
+[data-theme="excel"] .btn-primary.btn-sm-text { background: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.3); }
+[data-theme="excel"] .btn-primary.btn-sm-text:hover { background: rgba(255,255,255,0.3); }
+[data-theme="excel"] .chat-header {
+    background: #217346;
+    border-bottom: 1px solid #185c37;
+}
+[data-theme="excel"] #current-room-name { color: #ffffff; }
+[data-theme="excel"] .room-topic-display { color: rgba(255,255,255,0.7); }
+[data-theme="excel"] .chat-header-right .btn-icon { color: rgba(255,255,255,0.8); }
+[data-theme="excel"] .chat-header-right .btn-icon:hover { background: rgba(255,255,255,0.1); color: #ffffff; }
+[data-theme="excel"] .btn-leave-room { color: #ffffff; border-color: rgba(255,255,255,0.5); }
+[data-theme="excel"] .btn-leave-room:hover { background: rgba(255,255,255,0.15); color: #ffffff; }
+[data-theme="excel"] .btn-header-invite { color: #ffffff; border-color: rgba(255,255,255,0.5); }
+[data-theme="excel"] .btn-header-invite:hover { background: rgba(255,255,255,0.2); color: #ffffff; }
+[data-theme="excel"] #room-lock-icon { color: #ffffff; }
+[data-theme="excel"] #msg-input, [data-theme="excel"] #lobby-msg-input {
+    border: 1px solid #d4d4d4;
+    background: #ffffff;
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+}
+[data-theme="excel"] #msg-input:focus, [data-theme="excel"] #lobby-msg-input:focus {
+    border-color: #217346;
+    box-shadow: 0 0 0 1px #217346;
+    background: #ffffff;
+}
+[data-theme="excel"] .modal-input { border: 1px solid #d4d4d4; }
+[data-theme="excel"] .modal-input:focus { border-color: #217346; background: #ffffff; }
+[data-theme="excel"] .messages-area {
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+    background: #ffffff;
+}
+[data-theme="excel"] .msg-text {
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+}
+[data-theme="excel"] .msg-self .msg-text {
+    background: #e2efda;
+    border-color: #c6e0b4;
+}
+[data-theme="excel"] .users-panel { background: #f9f9f9; border-left: 1px solid #d4d4d4; }
+[data-theme="excel"] .users-header { border-bottom-color: #d4d4d4; }
+[data-theme="excel"] .input-area { border-top: 1px solid #d4d4d4; background: #f3f3f3; }
+[data-theme="excel"] .btn-send { border-radius: 4px; }
+[data-theme="excel"] .btn-invite { background: #e2efda; color: #217346; border-radius: 4px; }
+[data-theme="excel"] .btn-invite:hover { background: #c6e0b4; }
+[data-theme="excel"] .modal-box { border-radius: 4px; border: 1px solid #d4d4d4; }
+[data-theme="excel"] .settings-panel { border-left-color: #d4d4d4; }
+[data-theme="excel"] .toast { background: #217346; color: #ffffff; border-radius: 4px; }
+[data-theme="excel"] .mention { background: #e2efda; color: #217346; }
+[data-theme="excel"] .sidebar-footer { border-top-color: #e0e0e0; }
+[data-theme="excel"] .btn-settings-sidebar { color: #616161; }
+[data-theme="excel"] .btn-settings-sidebar:hover { background: #e6e6e6; color: #1f1f1f; }
+[data-theme="excel"] #user-count { background: #e2efda; color: #217346; }
+[data-theme="excel"] .room-type-btn.active { background: #e2efda; color: #217346; border-color: #217346; }
+[data-theme="excel"] .unread-badge { background: #c50f1f; }
+[data-theme="excel"] .capacity-slider { accent-color: #217346; }
+[data-theme="excel"] #opacity-value { color: #217346; }
+[data-theme="excel"] .capacity-value { color: #217346; }
+[data-theme="excel"] .theme-btn.active { background: #e2efda; color: #217346; border-color: #217346; }
+[data-theme="excel"] .theme-btn:hover { border-color: #217346; color: #217346; }
+[data-theme="excel"] #chat-back-btn { color: #ffffff; }
+[data-theme="excel"] #chat-back-btn:hover { background: rgba(255,255,255,0.1); }
+
 html, body {
     height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
@@ -960,7 +1235,8 @@ a { color: var(--accent); text-decoration: none; }
 
 /* ─── Theme Selector ─── */
 .theme-group {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
@@ -999,6 +1275,9 @@ a { color: var(--accent); text-decoration: none; }
 .theme-swatch-dark   { background: linear-gradient(to right, #1a1d21 50%, #ffffff 50%); }
 .theme-swatch-light  { background: linear-gradient(to right, #e8eaed 50%, #ffffff 50%); }
 .theme-swatch-midnight { background: linear-gradient(to right, #0d1117 50%, #161b22 50%); }
+.theme-swatch-vscode { background: linear-gradient(to right, #252526 50%, #1e1e1e 50%); }
+.theme-swatch-terminal { background: linear-gradient(to right, #000000 50%, #0c0c0c 50%); }
+.theme-swatch-excel  { background: linear-gradient(to right, #217346 50%, #ffffff 50%); }
 
 /* ─── Opacity ─── */
 .opacity-label {
@@ -1527,3 +1806,303 @@ button:focus-visible, input:focus-visible {
     #pwa-installed-group { display: block !important; }
 }
 
+/* =========================================
+   Disguise Chrome - Theme-specific UI overlays
+   ========================================= */
+
+/* All disguise elements hidden by default */
+.disguise-el { display: none !important; }
+
+/* Shared window controls */
+.disguise-wctl { display: flex; height: 100%; }
+.wctl { width: 46px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: default; font-size: 11px; }
+.wctl:hover { background: rgba(255,255,255,0.1); }
+.wctl-x:hover { background: #e81123 !important; color: #fff; }
+.wctl-x-red:hover { background: #c42b1c !important; color: #fff; }
+
+/* =========================
+   VSCode Disguise Chrome
+   ========================= */
+[data-theme="vscode"] .disguise-vscode { display: flex !important; }
+
+[data-theme="vscode"] #app {
+    position: fixed !important;
+    top: 87px;
+    left: 48px;
+    right: 0;
+    bottom: 22px;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Title bar */
+.vscode-titlebar {
+    position: fixed; top: 0; left: 0; right: 0; height: 30px;
+    background: #323233; color: #999; font-size: 12px;
+    display: flex; align-items: center; z-index: 9000;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.vsc-tb-menus { display: flex; margin-left: 48px; }
+.vsc-tb-menus span { padding: 0 8px; height: 30px; display: flex; align-items: center; cursor: default; color: #ccc; font-size: 13px; }
+.vsc-tb-menus span:hover { background: rgba(255,255,255,0.08); }
+.vsc-tb-title { flex: 1; text-align: center; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vscode-titlebar .wctl { color: #999; }
+
+/* Activity bar */
+.vscode-activitybar {
+    position: fixed; top: 30px; left: 0; width: 48px; bottom: 22px;
+    background: #333333; display: flex; flex-direction: column; justify-content: space-between;
+    z-index: 9000;
+}
+.vsc-ab-top, .vsc-ab-bottom { display: flex; flex-direction: column; }
+.vsc-ab-icon {
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    cursor: default; color: rgba(255,255,255,0.4); border-left: 2px solid transparent;
+}
+.vsc-ab-icon svg { width: 24px; height: 24px; }
+.vsc-ab-icon:hover { color: rgba(255,255,255,0.7); }
+.vsc-ab-icon.active { color: #fff; border-left-color: #fff; }
+
+/* Tab bar */
+.vscode-tabbar {
+    position: fixed; top: 30px; left: 48px; right: 0; height: 35px;
+    background: #252526; display: flex; align-items: stretch; z-index: 9000;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.vsc-tab {
+    display: flex; align-items: center; gap: 6px; padding: 0 12px;
+    font-size: 13px; color: rgba(255,255,255,0.5); cursor: default;
+    border-right: 1px solid #252526; background: #2d2d2d; white-space: nowrap;
+}
+.vsc-tab.active { background: #1e1e1e; color: #fff; }
+.vsc-ico-ts { color: #3178c6; font-size: 10px; font-weight: 700; }
+.vsc-ico-json { color: #fbc02d; font-size: 10px; }
+.vsc-ico-md { color: #42a5f5; font-size: 10px; }
+.vsc-tab-x { margin-left: 6px; font-size: 10px; opacity: 0; width: 16px; text-align: center; }
+.vsc-tab:hover .vsc-tab-x { opacity: 0.5; }
+.vsc-tab.active .vsc-tab-x { opacity: 0.3; }
+
+/* Breadcrumb */
+.vscode-breadcrumb {
+    position: fixed; top: 65px; left: 48px; right: 0; height: 22px;
+    background: #1e1e1e; display: flex; align-items: center;
+    padding: 0 12px; font-size: 12px; color: #999; z-index: 9000; gap: 4px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.vsc-bc-sep { color: #666; font-size: 10px; }
+.vsc-bc-cur { color: #e0e0e0; }
+
+/* Status bar */
+.vscode-statusbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 22px;
+    background: #007acc; display: flex; align-items: center; justify-content: space-between;
+    z-index: 9000; font-size: 12px; color: #fff; padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.vsc-sb-l, .vsc-sb-r { display: flex; align-items: center; height: 100%; }
+.vsc-sb-l span, .vsc-sb-r span { padding: 0 6px; height: 100%; display: flex; align-items: center; cursor: default; font-size: 12px; }
+.vsc-sb-l span:hover, .vsc-sb-r span:hover { background: rgba(255,255,255,0.12); }
+.vsc-sb-remote { background: #16825d; font-weight: 700; font-size: 11px; letter-spacing: 1px; }
+.vsc-sb-branch { font-weight: 500; }
+
+/* =========================
+   Terminal/PuTTY Disguise
+   ========================= */
+[data-theme="terminal"] .disguise-terminal { display: flex !important; }
+
+[data-theme="terminal"] #app {
+    position: fixed !important;
+    top: 51px;
+    left: 0; right: 0; bottom: 0;
+    height: auto !important;
+    max-height: none !important;
+    grid-template-areas: "main" !important;
+    grid-template-columns: 1fr !important;
+}
+[data-theme="terminal"] .sidebar { display: none !important; }
+[data-theme="terminal"] .users-panel { display: none !important; }
+[data-theme="terminal"] .mobile-nav { display: none !important; }
+
+/* Hide lobby header extras for clean terminal look */
+[data-theme="terminal"] .lobby-header { background: #000; border-bottom-color: #333; }
+[data-theme="terminal"] .btn-primary.btn-sm-text { display: none; }
+[data-theme="terminal"] .input-area { background: #000; border-top-color: #333; }
+
+/* Title bar */
+.term-titlebar {
+    position: fixed; top: 0; left: 0; right: 0; height: 30px;
+    background: #0c0c0c; display: flex; align-items: center; z-index: 9000;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; color: #aaa;
+    border-bottom: 1px solid #333;
+}
+.term-tb-ico { margin: 0 8px; font-size: 14px; }
+.term-tb-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.term-titlebar .wctl { color: #aaa; }
+
+/* Menu bar */
+.term-menubar {
+    position: fixed; top: 30px; left: 0; right: 0; height: 20px;
+    background: #0c0c0c; display: flex; align-items: stretch; z-index: 9000;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; color: #ccc;
+    border-bottom: 1px solid #333;
+}
+.term-mi { padding: 0 8px; display: flex; align-items: center; cursor: default; }
+.term-mi:hover { background: #333; }
+
+/* =========================
+   Excel Disguise Chrome
+   ========================= */
+[data-theme="excel"] .disguise-excel { display: flex !important; }
+
+[data-theme="excel"] #app {
+    position: fixed !important;
+    top: 186px;
+    left: 0; right: 0;
+    bottom: 46px;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Excel title bar */
+.excel-titlebar {
+    position: fixed; top: 0; left: 0; right: 0; height: 30px;
+    background: #217346; display: flex; align-items: center; z-index: 9000;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; color: #fff;
+}
+.excel-qat { display: flex; align-items: center; margin-left: 4px; gap: 2px; }
+.excel-qat span { padding: 2px 4px; font-size: 13px; cursor: default; }
+.excel-qat-sep { color: rgba(255,255,255,0.3); margin: 0 2px; }
+.excel-tb-title { flex: 1; text-align: center; font-size: 12px; font-weight: 500; }
+.excel-titlebar .wctl { color: #fff; }
+
+/* Ribbon tabs */
+.excel-ribbon-tabs {
+    position: fixed; top: 30px; left: 0; right: 0; height: 26px;
+    background: #217346; display: flex; align-items: stretch; z-index: 9000;
+    padding-left: 4px;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px;
+}
+.excel-rtab {
+    padding: 0 14px; display: flex; align-items: center;
+    color: rgba(255,255,255,0.85); cursor: default; font-weight: 500;
+}
+.excel-rtab:hover { background: rgba(255,255,255,0.08); }
+.excel-rtab.active {
+    background: #f3f3f3; color: #217346; font-weight: 600;
+    border-radius: 3px 3px 0 0;
+}
+.excel-rtab-file { background: #185c37; color: #fff !important; font-weight: 600; }
+.excel-rtab-file:hover { background: #0e4028 !important; }
+
+/* Ribbon content */
+.excel-ribbon {
+    position: fixed; top: 56px; left: 0; right: 0; height: 84px;
+    background: #f3f3f3; display: flex; align-items: stretch; z-index: 9000;
+    padding: 4px 8px; gap: 0; border-bottom: 1px solid #d4d4d4;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.excel-rg { display: flex; flex-direction: column; padding: 0 6px; }
+.excel-rg-items { flex: 1; display: flex; align-items: center; gap: 4px; }
+.excel-rg-label { font-size: 10px; color: #616161; text-align: center; padding-top: 2px; }
+.excel-rg-sep { width: 1px; background: #d4d4d4; margin: 4px 2px; }
+.excel-rg-big { text-align: center; font-size: 20px; padding: 2px 8px; cursor: default; line-height: 1.2; color: #1f1f1f; }
+.excel-rg-big small { font-size: 10px; display: block; color: #1f1f1f; }
+.excel-rg-stack { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: #1f1f1f; }
+.excel-rg-stack > span { padding: 1px 4px; cursor: default; white-space: nowrap; }
+.excel-rg-stack > span:hover { background: #e0e0e0; }
+.excel-rg-row { display: flex; gap: 1px; align-items: center; }
+.excel-dd {
+    padding: 2px 6px; border: 1px solid #c4c4c4; border-radius: 2px;
+    font-size: 11px; background: #fff; cursor: default; white-space: nowrap; color: #1f1f1f;
+}
+.excel-dd-sm {
+    padding: 2px 4px; border: 1px solid #c4c4c4; border-radius: 2px;
+    font-size: 11px; background: #fff; cursor: default; width: 40px; text-align: center; color: #1f1f1f;
+}
+.excel-tb-btn {
+    width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid transparent; cursor: default; font-size: 12px; color: #1f1f1f;
+}
+.excel-tb-btn:hover { background: #e0e0e0; border-color: #c4c4c4; }
+
+/* Formula bar */
+.excel-formula-bar {
+    position: fixed; top: 140px; left: 0; right: 0; height: 26px;
+    background: #fff; display: flex; align-items: center; z-index: 9000;
+    border-bottom: 1px solid #d4d4d4;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px;
+}
+.excel-fb-ref {
+    width: 60px; text-align: center; color: #1f1f1f;
+    border-right: 1px solid #d4d4d4; height: 100%; display: flex; align-items: center; justify-content: center;
+}
+.excel-fb-fx {
+    width: 30px; text-align: center; color: #616161;
+    border-right: 1px solid #d4d4d4; height: 100%; display: flex; align-items: center; justify-content: center;
+}
+.excel-fb-input { flex: 1; padding: 0 8px; font-family: Calibri, Arial, sans-serif; }
+
+/* Column headers */
+.excel-colhdr {
+    position: fixed; top: 166px; left: 0; right: 0; height: 20px;
+    background: #f3f3f3; display: flex; align-items: center; z-index: 9000;
+    border-bottom: 1px solid #d4d4d4; font-size: 11px; color: #616161; overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.excel-colhdr span {
+    flex: 1; text-align: center; border-right: 1px solid #d4d4d4;
+    height: 100%; display: flex; align-items: center; justify-content: center;
+    min-width: 60px;
+}
+
+/* Sheet tabs */
+.excel-sheet-tabs {
+    position: fixed; bottom: 22px; left: 0; right: 0; height: 24px;
+    background: #f3f3f3; display: flex; align-items: center; z-index: 9000;
+    border-top: 1px solid #d4d4d4;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px;
+}
+.excel-st-nav { display: flex; margin-left: 4px; gap: 2px; }
+.excel-st-nav span { padding: 0 6px; cursor: default; color: #616161; }
+.excel-st-list { display: flex; margin-left: 4px; }
+.excel-st {
+    padding: 4px 12px; cursor: default; color: #616161;
+    border: 1px solid transparent; white-space: nowrap;
+}
+.excel-st.active {
+    background: #fff; color: #217346; border-color: #d4d4d4;
+    border-bottom-color: #fff; font-weight: 600;
+}
+.excel-st-add { padding: 4px 8px; cursor: default; color: #616161; }
+
+/* Excel status bar */
+.excel-statusbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 22px;
+    background: #217346; display: flex; align-items: center; justify-content: space-between;
+    z-index: 9000; font-size: 11px; color: #fff; padding: 0 12px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.excel-stb-l, .excel-stb-r { display: flex; gap: 12px; }
+
+/* =========================
+   Responsive: hide chrome on small screens
+   ========================= */
+@media (max-width: 1023px) {
+    [data-theme="vscode"] .disguise-vscode,
+    [data-theme="terminal"] .disguise-terminal,
+    [data-theme="excel"] .disguise-excel { display: none !important; }
+    [data-theme="vscode"] #app,
+    [data-theme="terminal"] #app,
+    [data-theme="excel"] #app {
+        position: static !important;
+        top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+        height: 100vh !important;
+        max-height: 100dvh !important;
+    }
+    [data-theme="terminal"] #app {
+        grid-template-areas: "main" !important;
+        grid-template-columns: 1fr !important;
+    }
+    [data-theme="terminal"] .sidebar { display: none !important; }
+    [data-theme="terminal"] .users-panel { display: none !important; }
+}

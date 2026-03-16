@@ -31,7 +31,7 @@ class WorkChat {
 
         // Settings
         this.nickname = localStorage.getItem('wc_nickname') || '';
-        this.theme = localStorage.getItem('wc_theme') || 'dark';
+        this.theme = localStorage.getItem('wc_theme') || 'midnight';
         this.opacity = parseFloat(localStorage.getItem('wc_opacity') || '1');
 
         // Room state
@@ -102,9 +102,31 @@ class WorkChat {
         localStorage.setItem('wc_theme', theme);
 
         // Sync PWA theme-color to sidebar color
-        const colors = { dark: '#1a1d21', light: '#e8eaed', midnight: '#0d1117' };
+        const colors = { dark: '#1a1d21', light: '#e8eaed', midnight: '#0d1117', vscode: '#1e1e1e', terminal: '#000000', excel: '#217346' };
         const meta = document.getElementById('meta-theme-color');
         if (meta) meta.content = colors[theme] || colors.dark;
+
+        // Disguise: change document title
+        const titles = {
+            vscode: 'chat.ts - WorkChat - Visual Studio Code',
+            terminal: `${this.nickname || 'user'}@chat-server: ~`,
+            excel: 'Book1 - Excel',
+        };
+        document.title = titles[theme] || 'Chat';
+
+        // Update terminal title bar text
+        const termTitle = document.getElementById('term-title-text');
+        if (termTitle) termTitle.textContent = `${this.nickname || 'user'}@chat-server: ~`;
+
+        // Generate Excel column headers (once)
+        const colhdr = document.getElementById('excel-colhdr');
+        if (colhdr && !colhdr.hasChildNodes()) {
+            for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                const s = document.createElement('span');
+                s.textContent = c;
+                colhdr.appendChild(s);
+            }
+        }
 
         // Update active state on theme buttons
         document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -169,6 +191,7 @@ class WorkChat {
         this.users = [];
         this.unreadLobby = 0;
         this.updateLobbyBadge();
+        this.renderLobbyUsers();
     }
 
     showChatState(roomName, topic, isPrivate) {
@@ -1348,6 +1371,23 @@ class WorkChat {
 
         document.getElementById('btn-toggle-members')?.addEventListener('click', () => {
             document.getElementById('users-panel').classList.toggle('visible');
+        });
+
+        // Theme cycle shortcut: Ctrl+Alt+T
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.altKey && e.key === 't') {
+                e.preventDefault();
+                const themes = ['dark', 'light', 'midnight', 'vscode', 'terminal', 'excel'];
+                const idx = themes.indexOf(this.theme);
+                this.applyTheme(themes[(idx + 1) % themes.length]);
+            }
+        });
+
+        // Disguise chrome: click certain items to open settings
+        document.querySelectorAll('.disguise-settings-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('settings-panel').classList.toggle('open');
+            });
         });
 
         // Invite user modal

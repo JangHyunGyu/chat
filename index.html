@@ -223,7 +223,7 @@
         <div class="setting-group">
             <h4>테마</h4>
             <div class="theme-group">
-                <button class="theme-btn active" data-theme="dark">
+                <button class="theme-btn" data-theme="dark">
                     <div class="theme-swatch theme-swatch-dark"></div>
                     다크
                 </button>
@@ -231,9 +231,21 @@
                     <div class="theme-swatch theme-swatch-light"></div>
                     라이트
                 </button>
-                <button class="theme-btn" data-theme="midnight">
+                <button class="theme-btn active" data-theme="midnight">
                     <div class="theme-swatch theme-swatch-midnight"></div>
                     미드나잇
+                </button>
+                <button class="theme-btn" data-theme="vscode">
+                    <div class="theme-swatch theme-swatch-vscode"></div>
+                    VSCode
+                </button>
+                <button class="theme-btn" data-theme="terminal">
+                    <div class="theme-swatch theme-swatch-terminal"></div>
+                    Terminal
+                </button>
+                <button class="theme-btn" data-theme="excel">
+                    <div class="theme-swatch theme-swatch-excel"></div>
+                    Excel
                 </button>
             </div>
         </div>
@@ -293,6 +305,93 @@
         <p class="modal-subtitle">온라인 사용자 중 초대할 사람을 선택하세요.</p>
         <div id="invite-user-list" class="invite-user-list"></div>
     </div>
+</div>
+
+<!-- ━━━━━ Disguise Chrome (theme-specific UI overlays) ━━━━━ -->
+
+<!-- VSCode Chrome -->
+<div class="disguise-el disguise-vscode vscode-titlebar">
+    <div class="vsc-tb-menus"><span>File</span><span>Edit</span><span>Selection</span><span>View</span><span>Go</span><span>Run</span><span>Terminal</span><span>Help</span></div>
+    <div class="vsc-tb-title">chat.ts - WorkChat - Visual Studio Code</div>
+    <div class="disguise-wctl"><span class="wctl">─</span><span class="wctl">□</span><span class="wctl wctl-x">✕</span></div>
+</div>
+<div class="disguise-el disguise-vscode vscode-activitybar">
+    <div class="vsc-ab-top">
+        <div class="vsc-ab-icon active" title="Explorer"><svg viewBox="0 0 28 28" width="28" height="28"><path fill="currentColor" d="M20 2H8L6 4v5H3L1 11v13l2 2h13l2-2v-3h5l2-2V6l-5-4zm-4 20H3V11h3v7l2 2h8v2zm6-5H8V4h8v4h4v9z"/></svg></div>
+        <div class="vsc-ab-icon" title="Search"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M18.68 16.56l6.07 6.07-2.12 2.12-6.07-6.07A8.5 8.5 0 1116.56 18.68zM11.5 18a6.5 6.5 0 100-13 6.5 6.5 0 000 13z"/></svg></div>
+        <div class="vsc-ab-icon" title="Source Control"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M21.5 11.5a3.5 3.5 0 00-3.26 2.22A3 3 0 0115.5 16h-3a4.5 4.5 0 00-3 1.15V8.28a3.5 3.5 0 10-1.5 0v11.44a3.5 3.5 0 101.5.07A3 3 0 0112.5 17h3a4.5 4.5 0 004.26-3.04A3.5 3.5 0 0021.5 11.5zM7.75 5.5a2 2 0 11-4 0 2 2 0 014 0zm0 17a2 2 0 11-4 0 2 2 0 014 0zm13.75-9a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+        <div class="vsc-ab-icon" title="Run"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M10 5l12 9-12 9V5z"/></svg></div>
+        <div class="vsc-ab-icon" title="Extensions"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M15 2h9l2 2v9l-2 2h-9l-2-2V4l2-2zm1.5 1.5v9h9v-9h-9zM2 15h9l2 2v9l-2 2H2l-2-2v-9l2-2zm1.5 1.5v9h9v-9h-9zM2 2h9l2 2v9l-2 2H2L0 13V4l2-2zm1.5 1.5v9h9v-9h-9z"/></svg></div>
+    </div>
+    <div class="vsc-ab-bottom">
+        <div class="vsc-ab-icon" title="Accounts"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M14 14a5 5 0 100-10 5 5 0 000 10zm0-8.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7zM14 16c-5.52 0-10 3.13-10 7v1h20v-1c0-3.87-4.48-7-10-7zm-8.46 6.5C6.18 20.1 9.72 17.5 14 17.5s7.82 2.6 8.46 4.5H5.54z"/></svg></div>
+        <div class="vsc-ab-icon disguise-settings-btn" title="Settings"><svg viewBox="0 0 28 28" width="24" height="24"><path fill="currentColor" d="M24.4 10l-2.2-.4a9.2 9.2 0 00-.8-1.8l1.2-1.9-2.5-2.5-1.9 1.2a9.2 9.2 0 00-1.8-.8L16 1.5h-3.5L12 3.7a9.2 9.2 0 00-1.8.8L8.3 3.3 5.8 5.8l1.2 1.9a9.2 9.2 0 00-.8 1.8L4 10v3.5l2.2.4c.2.6.5 1.3.8 1.8l-1.2 1.9 2.5 2.5 1.9-1.2c.5.3 1.2.6 1.8.8l.5 2.2H16l.5-2.2c.6-.2 1.3-.5 1.8-.8l1.9 1.2 2.5-2.5-1.2-1.9c.3-.5.6-1.2.8-1.8l2.2-.5V10zm-10.1 6a4.2 4.2 0 110-8.5 4.2 4.2 0 010 8.5z"/></svg></div>
+    </div>
+</div>
+<div class="disguise-el disguise-vscode vscode-tabbar">
+    <div class="vsc-tab active"><span class="vsc-ico-ts">TS</span>chat.ts<span class="vsc-tab-x">✕</span></div>
+    <div class="vsc-tab"><span class="vsc-ico-json">{}</span>package.json<span class="vsc-tab-x">✕</span></div>
+    <div class="vsc-tab"><span class="vsc-ico-md">M↓</span>README.md<span class="vsc-tab-x">✕</span></div>
+</div>
+<div class="disguise-el disguise-vscode vscode-breadcrumb">
+    <span>src</span><span class="vsc-bc-sep">›</span><span>components</span><span class="vsc-bc-sep">›</span><span class="vsc-bc-cur">chat.ts</span>
+</div>
+<div class="disguise-el disguise-vscode vscode-statusbar">
+    <div class="vsc-sb-l"><span class="vsc-sb-remote">><</span><span class="vsc-sb-branch">⎇ main</span><span class="vsc-sb-sync">↻</span><span>0⚠ 0ⓘ</span></div>
+    <div class="vsc-sb-r"><span>Ln 42, Col 18</span><span>Spaces: 2</span><span>UTF-8</span><span>CRLF</span><span>TypeScript</span><span>🔔</span></div>
+</div>
+
+<!-- Terminal/PuTTY Chrome -->
+<div class="disguise-el disguise-terminal term-titlebar">
+    <div class="term-tb-ico">⬜</div>
+    <div class="term-tb-text" id="term-title-text">user@chat-server: ~</div>
+    <div class="disguise-wctl"><span class="wctl">─</span><span class="wctl">□</span><span class="wctl wctl-x">✕</span></div>
+</div>
+<div class="disguise-el disguise-terminal term-menubar">
+    <span class="term-mi disguise-settings-btn">Session</span><span class="term-mi">Edit</span><span class="term-mi">View</span><span class="term-mi">Connection</span><span class="term-mi">Transfer</span><span class="term-mi">Window</span><span class="term-mi">Help</span>
+</div>
+
+<!-- Excel Chrome -->
+<div class="disguise-el disguise-excel excel-titlebar">
+    <div class="excel-qat"><span>💾</span><span>↩</span><span>↪</span><span class="excel-qat-sep">|</span></div>
+    <div class="excel-tb-title">Book1 - Excel</div>
+    <div class="disguise-wctl"><span class="wctl">─</span><span class="wctl">□</span><span class="wctl wctl-x wctl-x-red">✕</span></div>
+</div>
+<div class="disguise-el disguise-excel excel-ribbon-tabs">
+    <span class="excel-rtab excel-rtab-file disguise-settings-btn">파일</span>
+    <span class="excel-rtab active">홈</span><span class="excel-rtab">삽입</span><span class="excel-rtab">페이지 레이아웃</span><span class="excel-rtab">수식</span><span class="excel-rtab">데이터</span><span class="excel-rtab">검토</span><span class="excel-rtab">보기</span>
+</div>
+<div class="disguise-el disguise-excel excel-ribbon">
+    <div class="excel-rg">
+        <div class="excel-rg-items"><div class="excel-rg-big">📋<br><small>붙여넣기</small></div><div class="excel-rg-stack"><span>✂ 잘라내기</span><span>📄 복사</span><span>🖌 서식복사</span></div></div>
+        <div class="excel-rg-label">클립보드</div>
+    </div><div class="excel-rg-sep"></div>
+    <div class="excel-rg">
+        <div class="excel-rg-items"><div class="excel-rg-stack"><div class="excel-rg-row"><span class="excel-dd">맑은 고딕 ▾</span><span class="excel-dd-sm">11 ▾</span></div><div class="excel-rg-row"><span class="excel-tb-btn"><b>B</b></span><span class="excel-tb-btn"><i>I</i></span><span class="excel-tb-btn"><u>U</u></span><span class="excel-tb-btn">⬜▾</span><span class="excel-tb-btn"><b style="color:#c00">A</b>▾</span></div></div></div>
+        <div class="excel-rg-label">글꼴</div>
+    </div><div class="excel-rg-sep"></div>
+    <div class="excel-rg">
+        <div class="excel-rg-items"><div class="excel-rg-stack"><div class="excel-rg-row"><span class="excel-tb-btn">☰</span><span class="excel-tb-btn">☰</span><span class="excel-tb-btn">☰</span><span class="excel-tb-btn">⇄</span></div><div class="excel-rg-row"><span class="excel-tb-btn">⫶</span><span class="excel-tb-btn">⊞</span><span class="excel-tb-btn">↕</span></div></div></div>
+        <div class="excel-rg-label">맞춤</div>
+    </div><div class="excel-rg-sep"></div>
+    <div class="excel-rg">
+        <div class="excel-rg-items"><div class="excel-rg-stack"><div class="excel-rg-row"><span class="excel-dd">일반 ▾</span></div><div class="excel-rg-row"><span class="excel-tb-btn">%</span><span class="excel-tb-btn">,</span><span class="excel-tb-btn">.0→</span><span class="excel-tb-btn">←.0</span></div></div></div>
+        <div class="excel-rg-label">표시 형식</div>
+    </div>
+</div>
+<div class="disguise-el disguise-excel excel-formula-bar">
+    <div class="excel-fb-ref">A1</div>
+    <div class="excel-fb-fx"><i>f</i><sub>x</sub></div>
+    <div class="excel-fb-input"></div>
+</div>
+<div class="disguise-el disguise-excel excel-colhdr" id="excel-colhdr"></div>
+<div class="disguise-el disguise-excel excel-sheet-tabs">
+    <div class="excel-st-nav"><span>◁</span><span>▷</span></div>
+    <div class="excel-st-list"><span class="excel-st active">Sheet1</span><span class="excel-st">Sheet2</span><span class="excel-st">Sheet3</span><span class="excel-st-add">⊕</span></div>
+</div>
+<div class="disguise-el disguise-excel excel-statusbar">
+    <div class="excel-stb-l">준비</div>
+    <div class="excel-stb-r"><span>평균: -</span><span>개수: 1</span><span>합계: 0</span></div>
 </div>
 
 <!-- ━━━━━ Toast Notification ━━━━━ -->
