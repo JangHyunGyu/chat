@@ -1182,7 +1182,7 @@ a { color: var(--accent); text-decoration: none; }
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.settings-panel.open { transform: none; }
+.settings-panel.open { transform: none; z-index: 9999; }
 
 .settings-header {
     display: flex;
