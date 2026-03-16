@@ -2106,7 +2106,9 @@ button:focus-visible, input:focus-visible {
     font-size: 14px; color: #cccccc; line-height: 1.4;
 }
 [data-theme="terminal"] .msg-self .msg-text { background: transparent !important; color: #cccccc; }
-[data-theme="terminal"] .msg-name { font-size: 14px; color: #888; }
+[data-theme="terminal"] .msg-name { font-size: 13px; color: #666; }
+[data-theme="terminal"] .msg-header { display: none; }
+[data-theme="terminal"] .msg-text::before { content: "$ "; color: #555; }
 [data-theme="terminal"] .msg-name::before { content: ""; }
 [data-theme="terminal"] .msg-name::after { content: ":"; color: #666; }
 [data-theme="terminal"] .msg-time { display: none; }
@@ -2305,10 +2307,34 @@ button:focus-visible, input:focus-visible {
     border: 1px solid #d4d4d4; font-family: Calibri, Arial, sans-serif; font-size: 14px;
     border-radius: 0; padding: 6px 8px;
 }
+/* Excel: full disguise of chat elements */
 [data-theme="excel"] .sidebar { background: #f3f3f3; border-right: 1px solid #d4d4d4; }
 [data-theme="excel"] .sidebar-header { background: #217346; border-bottom: 1px solid #185c37; }
 [data-theme="excel"] .sidebar-actions { border-bottom: 1px solid #e0e0e0; }
 [data-theme="excel"] .sidebar-footer { border-top-color: #e0e0e0; }
+[data-theme="excel"] .btn-new-room { font-size: 0; background: #217346; }
+[data-theme="excel"] .btn-new-room span { display: none; }
+[data-theme="excel"] .btn-new-room::before { content: "+ 새 시트"; font-size: 13px; }
+[data-theme="excel"] .section-label { font-size: 0; }
+[data-theme="excel"] .section-label::before { content: "시트 목록"; font-size: 11px; color: #616161; }
+[data-theme="excel"] .room-list-empty { font-size: 0; }
+[data-theme="excel"] .room-list-empty::before { content: "시트가 없습니다.\A새 시트를 추가하세요."; white-space: pre-wrap; font-size: 12px; color: #8a8a8a; }
+[data-theme="excel"] .room-item-icon { font-size: 0; }
+[data-theme="excel"] .room-item-icon::before { content: "📊"; font-size: 13px; }
+[data-theme="excel"] #my-name-display { font-size: 12px; }
+[data-theme="excel"] .my-avatar { font-size: 11px; }
+[data-theme="excel"] .lobby-header { background: #f3f3f3; border-bottom: 1px solid #d4d4d4; }
+[data-theme="excel"] .lobby-title { font-size: 0; color: #1f1f1f; }
+[data-theme="excel"] .lobby-title::before { content: "메모"; font-size: 12px; color: #616161; font-weight: 500; }
+[data-theme="excel"] .lobby-user-count { display: none; }
+[data-theme="excel"] .btn-primary.btn-sm-text { display: none; }
+[data-theme="excel"] .input-area { background: #fff; border-top: 1px solid #d4d4d4; height: auto; padding: 4px 8px; }
+[data-theme="excel"] .btn-send { font-size: 0; width: 28px; padding: 8px; background: #217346; border-radius: 2px; }
+[data-theme="excel"] .btn-send::before { content: "▶"; font-size: 11px; }
+[data-theme="excel"] #msg-input::placeholder,
+[data-theme="excel"] #lobby-msg-input::placeholder { color: #b0b0b0; }
+[data-theme="excel"] .msg-system { font-size: 0; }
+[data-theme="excel"] .msg-system::before { font-size: 11px; }
 [data-theme="excel"] .users-panel {
     background: #fff; border-left: 1px solid #d4d4d4;
 }
@@ -2317,7 +2343,8 @@ button:focus-visible, input:focus-visible {
     font-weight: 400; background: #f3f3f3; height: 20px; min-height: 20px;
     padding: 0 8px; font-family: 'Segoe UI', system-ui, sans-serif;
 }
-[data-theme="excel"] #users-panel-title { color: #616161; font-size: 10px; }
+[data-theme="excel"] #users-panel-title { font-size: 0; }
+[data-theme="excel"] #users-panel-title::before { content: "메모"; font-size: 10px; color: #616161; }
 [data-theme="excel"] #user-count { display: none; }
 [data-theme="excel"] .user-list { padding: 0; }
 [data-theme="excel"] .user-item {
@@ -2326,11 +2353,21 @@ button:focus-visible, input:focus-visible {
 }
 [data-theme="excel"] .user-item:hover { background: #e2efda; }
 [data-theme="excel"] .user-name { color: #1f1f1f !important; font-size: 12px; font-family: Calibri, 'Segoe UI', sans-serif; }
-[data-theme="excel"] .user-avatar { font-size: 12px; color: #616161; }
+[data-theme="excel"] .user-avatar { display: none; }
 [data-theme="excel"] .user-item.me { opacity: 1; }
 [data-theme="excel"] .btn-dm { color: #b0b0b0; font-size: 10px; }
 [data-theme="excel"] .btn-dm:hover { background: #e0e0e0; color: #217346; }
 [data-theme="excel"] .users-footer { display: none; }
+[data-theme="excel"] .chat-header { background: #f3f3f3; border-bottom: 1px solid #d4d4d4; }
+[data-theme="excel"] #current-room-name { color: #1f1f1f; font-size: 13px; font-weight: 500; }
+[data-theme="excel"] .btn-leave-room { color: #616161; border-color: #d4d4d4; font-size: 11px; }
+[data-theme="excel"] .btn-leave-room:hover { background: #e0e0e0; color: #1f1f1f; }
+[data-theme="excel"] .chat-header-right .btn-icon { color: #616161; }
+[data-theme="excel"] .chat-header-right .btn-icon:hover { background: #e0e0e0; color: #1f1f1f; }
+[data-theme="excel"] .btn-header-invite { color: #217346; border-color: #217346; }
+[data-theme="excel"] #room-lock-icon { color: #616161; }
+[data-theme="excel"] #chat-back-btn { color: #616161; }
+[data-theme="excel"] #chat-back-btn:hover { background: #e0e0e0; }
 
 /* Excel status bar */
 .excel-statusbar {
