@@ -128,6 +128,19 @@ class WorkChat {
             }
         }
 
+        // Disguise: change placeholders
+        const placeholders = { vscode: '$ ', terminal: '$ ', excel: '입력...' };
+        const ph = placeholders[theme] || null;
+        const lobbyInput = document.getElementById('lobby-msg-input');
+        const msgInput = document.getElementById('msg-input');
+        if (ph) {
+            if (lobbyInput) lobbyInput.placeholder = ph;
+            if (msgInput) msgInput.placeholder = ph;
+        } else {
+            if (lobbyInput) lobbyInput.placeholder = '로비에서 메시지 입력...';
+            if (msgInput) msgInput.placeholder = '메시지를 입력하세요...';
+        }
+
         // Reset terminal users panel when switching themes
         const usersPanel = document.getElementById('users-panel');
         if (usersPanel) {
