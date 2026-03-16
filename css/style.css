@@ -2335,6 +2335,9 @@ button:focus-visible, input:focus-visible {
 [data-theme="excel"] .btn-send::before { content: "▶"; font-size: 11px; }
 [data-theme="excel"] #msg-input::placeholder,
 [data-theme="excel"] #lobby-msg-input::placeholder { color: #b0b0b0; }
+[data-theme="excel"] .my-avatar { background: #d0d0d0; color: #616161; }
+[data-theme="excel"] #my-name-display { color: #616161; font-size: 12px; font-weight: 400; }
+[data-theme="excel"] .brand-badge { display: none; }
 [data-theme="excel"] .msg-system { font-size: 0; }
 [data-theme="excel"] .msg-system::before { font-size: 11px; }
 [data-theme="excel"] .users-panel {
