@@ -559,6 +559,10 @@ class WorkChat {
         this.createRoom(dmRoomName, '', dmPassword, 2);
     }
 
+    isDisguiseTheme() {
+        return this.theme === 'vscode' || this.theme === 'terminal' || this.theme === 'excel';
+    }
+
     addLobbyMessage(name, text, type = 'chat') {
         const el = document.getElementById('lobby-messages');
         if (!el) return;
@@ -567,6 +571,10 @@ class WorkChat {
         if (type === 'system') {
             msg.className = 'msg msg-system';
             msg.textContent = text;
+        } else if (this.isDisguiseTheme()) {
+            const isMe = name === this.nickname;
+            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
+            msg.innerHTML = `<div class="msg-text">${this.escapeHtml(text)}</div>`;
         } else {
             const isMe = name === this.nickname;
             msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
@@ -794,6 +802,10 @@ class WorkChat {
         if (type === 'system') {
             msg.className = 'msg msg-system';
             msg.textContent = text;
+        } else if (this.isDisguiseTheme()) {
+            const isMe = name === this.nickname;
+            msg.className = `msg ${isMe ? 'msg-self' : 'msg-other'}`;
+            msg.innerHTML = `<div class="msg-text">${this.escapeHtml(text)}</div>`;
         } else {
             const isMe = name === this.nickname;
             const mentionsMe = !isMe && text.includes('@' + this.nickname);
