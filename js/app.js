@@ -128,6 +128,13 @@ class WorkChat {
             }
         }
 
+        // Reset terminal users panel when switching themes
+        const usersPanel = document.getElementById('users-panel');
+        if (usersPanel) {
+            usersPanel.classList.remove('term-open');
+            usersPanel.style.display = '';
+        }
+
         // Update active state on theme buttons
         document.querySelectorAll('.theme-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.theme === theme);
@@ -1396,7 +1403,11 @@ class WorkChat {
             document.getElementById('settings-panel').classList.toggle('open');
         });
         document.getElementById('btn-term-users')?.addEventListener('click', () => {
-            document.getElementById('users-panel').classList.toggle('term-open');
+            const panel = document.getElementById('users-panel');
+            const isOpen = panel.classList.toggle('term-open');
+            if (this.theme === 'terminal') {
+                panel.style.display = isOpen ? 'flex' : 'none';
+            }
         });
 
         // Invite user modal
