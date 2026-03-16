@@ -2277,6 +2277,10 @@ button:focus-visible, input:focus-visible {
 [data-theme="excel"] .messages-area {
     background: #fff; gap: 0; padding: 0;
     font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+    background-image:
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+    background-size: 80px 22px;
 }
 [data-theme="excel"] .msg {
     max-width: 100%; padding: 2px 6px;
