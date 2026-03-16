@@ -1637,6 +1637,20 @@ button:focus-visible, input:focus-visible {
     line-height: 1.5;
 }
 
+.btn-settings-close-bottom {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: var(--radius);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+.btn-settings-close-bottom:hover { background: var(--border); }
+
 /* ─── Full room indicator ─── */
 .room-item.room-full {
     opacity: 0.5;
@@ -1909,6 +1923,49 @@ button:focus-visible, input:focus-visible {
 .vsc-sb-remote { background: #16825d; font-weight: 700; font-size: 11px; letter-spacing: 1px; }
 .vsc-sb-branch { font-weight: 500; }
 
+/* VSCode: restyle chat content to look like integrated terminal */
+[data-theme="vscode"] .lobby-header,
+[data-theme="vscode"] .chat-header {
+    background: #1e1e1e; border-bottom: 1px solid #3c3c3c; height: 28px;
+}
+[data-theme="vscode"] .lobby-title { font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="vscode"] .lobby-title::before { content: "TERMINAL"; }
+[data-theme="vscode"] .lobby-title { font-size: 0; }
+[data-theme="vscode"] .lobby-title::before { font-size: 11px; }
+[data-theme="vscode"] #current-room-name { font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; }
+[data-theme="vscode"] .lobby-user-count { display: none; }
+[data-theme="vscode"] .btn-primary.btn-sm-text { display: none; }
+[data-theme="vscode"] .input-area { background: #1e1e1e; border-top: 1px solid #3c3c3c; }
+[data-theme="vscode"] #msg-input,
+[data-theme="vscode"] #lobby-msg-input {
+    background: #1e1e1e; border: none; border-radius: 0; font-family: Consolas, 'Courier New', monospace; font-size: 13px; color: #cccccc;
+}
+[data-theme="vscode"] #msg-input:focus,
+[data-theme="vscode"] #lobby-msg-input:focus { box-shadow: none; background: #1e1e1e; }
+[data-theme="vscode"] .btn-send { display: none; }
+[data-theme="vscode"] .messages-area { background: #1e1e1e; gap: 0; padding: 8px 12px; }
+[data-theme="vscode"] .msg { max-width: 100%; }
+[data-theme="vscode"] .msg-self { align-self: flex-start; }
+[data-theme="vscode"] .msg-self .msg-header { flex-direction: row; }
+[data-theme="vscode"] .msg-text {
+    background: transparent !important; border-radius: 0; padding: 1px 0;
+    font-family: Consolas, 'Courier New', monospace; font-size: 13px; color: #cccccc;
+}
+[data-theme="vscode"] .msg-self .msg-text { background: transparent !important; color: #cccccc; }
+[data-theme="vscode"] .msg-name { font-size: 13px; font-family: Consolas, 'Courier New', monospace; }
+[data-theme="vscode"] .msg-name::before { content: ""; }
+[data-theme="vscode"] .msg-time { display: none; }
+[data-theme="vscode"] .msg-system { font-family: Consolas, 'Courier New', monospace; font-size: 12px; text-align: left; color: #6a9955; }
+[data-theme="vscode"] .msg-header { margin-bottom: 0; }
+[data-theme="vscode"] .sidebar-header { border-bottom-color: #3c3c3c; }
+[data-theme="vscode"] .section-label::before { content: ""; }
+[data-theme="vscode"] .room-item-icon { font-size: 12px; }
+[data-theme="vscode"] .btn-leave-room { font-size: 11px; border: none; color: #cccccc; padding: 3px 8px; }
+[data-theme="vscode"] .btn-leave-room:hover { background: rgba(255,255,255,0.1); color: #fff; }
+[data-theme="vscode"] .chat-header-right .btn-icon { font-size: 14px; }
+[data-theme="vscode"] .users-panel { background: #252526; border-left-color: #3c3c3c; }
+[data-theme="vscode"] .users-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 400; border-bottom-color: #3c3c3c; }
+
 /* =========================
    Terminal/PuTTY Disguise
    ========================= */
@@ -1931,6 +1988,40 @@ button:focus-visible, input:focus-visible {
 [data-theme="terminal"] .lobby-header { background: #000; border-bottom-color: #333; }
 [data-theme="terminal"] .btn-primary.btn-sm-text { display: none; }
 [data-theme="terminal"] .input-area { background: #000; border-top-color: #333; }
+
+/* Terminal settings button - hidden by default, shown only in terminal theme */
+.btn-terminal-settings { display: none; background: transparent; color: var(--text-secondary); font-size: 13px; padding: 4px 8px; cursor: pointer; gap: 4px; align-items: center; }
+.btn-terminal-settings:hover { color: var(--text-primary); }
+[data-theme="terminal"] .btn-terminal-settings { display: inline-flex; }
+
+/* Terminal: restyle chat content to look like actual terminal */
+[data-theme="terminal"] .lobby-header { height: 0; padding: 0; border: none; overflow: hidden; }
+[data-theme="terminal"] .chat-header { background: #000; border-bottom-color: #333; height: 28px; }
+[data-theme="terminal"] #current-room-name { font-size: 13px; font-weight: 400; }
+[data-theme="terminal"] .messages-area { background: #000; gap: 0; padding: 4px 8px; }
+[data-theme="terminal"] .msg { max-width: 100%; }
+[data-theme="terminal"] .msg-self { align-self: flex-start; }
+[data-theme="terminal"] .msg-self .msg-header { flex-direction: row; }
+[data-theme="terminal"] .msg-text {
+    background: transparent !important; border-radius: 0; padding: 0;
+    font-size: 14px; color: #cccccc; line-height: 1.4;
+}
+[data-theme="terminal"] .msg-self .msg-text { background: transparent !important; color: #cccccc; }
+[data-theme="terminal"] .msg-name { font-size: 14px; color: #4ec9b0; }
+[data-theme="terminal"] .msg-name::before { content: ""; }
+[data-theme="terminal"] .msg-name::after { content: ":"; color: #666; }
+[data-theme="terminal"] .msg-time { display: none; }
+[data-theme="terminal"] .msg-header { margin-bottom: 0; gap: 4px; }
+[data-theme="terminal"] .msg-system { text-align: left; align-self: flex-start; padding: 1px 0; font-size: 13px; color: #666; }
+[data-theme="terminal"] .msg-system::before { content: "# "; color: #555; }
+[data-theme="terminal"] .input-area { padding: 4px 8px; height: auto; }
+[data-theme="terminal"] #msg-input,
+[data-theme="terminal"] #lobby-msg-input {
+    background: #000; border: none; border-radius: 0; font-size: 14px; color: #cccccc; padding: 4px 8px;
+}
+[data-theme="terminal"] #msg-input:focus,
+[data-theme="terminal"] #lobby-msg-input:focus { box-shadow: none; background: #000; }
+[data-theme="terminal"] .btn-send { display: none; }
 
 /* Title bar */
 .term-titlebar {
@@ -2078,6 +2169,47 @@ button:focus-visible, input:focus-visible {
     border-bottom-color: #fff; font-weight: 600;
 }
 .excel-st-add { padding: 4px 8px; cursor: default; color: #616161; }
+
+/* Excel: restyle chat content to look like spreadsheet */
+[data-theme="excel"] .messages-area {
+    background: #fff; gap: 0; padding: 0;
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+}
+[data-theme="excel"] .msg {
+    max-width: 100%; padding: 2px 6px;
+    border-bottom: 1px solid #e0e0e0;
+}
+[data-theme="excel"] .msg-self { align-self: flex-start; }
+[data-theme="excel"] .msg-self .msg-header { flex-direction: row; }
+[data-theme="excel"] .msg-text {
+    background: transparent !important; border: none; border-radius: 0; padding: 2px 4px;
+    font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1f1f1f;
+}
+[data-theme="excel"] .msg-self .msg-text { background: transparent !important; color: #1f1f1f; }
+[data-theme="excel"] .msg-name { font-size: 11px; color: #217346; font-weight: 600; }
+[data-theme="excel"] .msg-time { display: none; }
+[data-theme="excel"] .msg-header { margin-bottom: 0; }
+[data-theme="excel"] .msg-system {
+    text-align: left; align-self: flex-start; padding: 2px 6px;
+    font-size: 11px; color: #8a8a8a; font-style: italic;
+    border-bottom: 1px solid #e0e0e0; width: 100%;
+}
+[data-theme="excel"] .msg-system::before { content: "// "; }
+[data-theme="excel"] .lobby-user-count { display: none; }
+[data-theme="excel"] .input-area {
+    background: #fff; border-top: 1px solid #d4d4d4; height: auto; padding: 4px 8px;
+}
+[data-theme="excel"] #msg-input,
+[data-theme="excel"] #lobby-msg-input {
+    border: 1px solid #d4d4d4; font-family: Calibri, Arial, sans-serif; font-size: 14px;
+    border-radius: 0; padding: 6px 8px;
+}
+[data-theme="excel"] .sidebar { background: #f3f3f3; border-right: 1px solid #d4d4d4; }
+[data-theme="excel"] .sidebar-header { background: #217346; border-bottom: 1px solid #185c37; }
+[data-theme="excel"] .sidebar-actions { border-bottom: 1px solid #e0e0e0; }
+[data-theme="excel"] .sidebar-footer { border-top-color: #e0e0e0; }
+[data-theme="excel"] .users-panel { background: #f9f9f9; border-left: 1px solid #d4d4d4; }
+[data-theme="excel"] .users-header { border-bottom-color: #d4d4d4; font-size: 11px; }
 
 /* Excel status bar */
 .excel-statusbar {

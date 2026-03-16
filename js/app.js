@@ -1324,6 +1324,9 @@ class WorkChat {
         document.getElementById('btn-settings-close').addEventListener('click', () => {
             document.getElementById('settings-panel').classList.remove('open');
         });
+        document.getElementById('btn-settings-close2').addEventListener('click', () => {
+            document.getElementById('settings-panel').classList.remove('open');
+        });
 
         // Theme buttons
         document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -1388,6 +1391,9 @@ class WorkChat {
             btn.addEventListener('click', () => {
                 document.getElementById('settings-panel').classList.toggle('open');
             });
+        });
+        document.getElementById('btn-terminal-settings')?.addEventListener('click', () => {
+            document.getElementById('settings-panel').classList.toggle('open');
         });
 
         // Invite user modal
