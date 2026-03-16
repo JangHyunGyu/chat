@@ -2054,7 +2054,7 @@ button:focus-visible, input:focus-visible {
     font-size: 14px; color: #cccccc; line-height: 1.4;
 }
 [data-theme="terminal"] .msg-self .msg-text { background: transparent !important; color: #cccccc; }
-[data-theme="terminal"] .msg-name { font-size: 14px; color: #4ec9b0; }
+[data-theme="terminal"] .msg-name { font-size: 14px; color: #888; }
 [data-theme="terminal"] .msg-name::before { content: ""; }
 [data-theme="terminal"] .msg-name::after { content: ":"; color: #666; }
 [data-theme="terminal"] .msg-time { display: none; }
