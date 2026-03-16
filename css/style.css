@@ -2255,8 +2255,14 @@ button:focus-visible, input:focus-visible {
 [data-theme="excel"] .sidebar-header { background: #217346; border-bottom: 1px solid #185c37; }
 [data-theme="excel"] .sidebar-actions { border-bottom: 1px solid #e0e0e0; }
 [data-theme="excel"] .sidebar-footer { border-top-color: #e0e0e0; }
-[data-theme="excel"] .users-panel { background: #f9f9f9; border-left: 1px solid #d4d4d4; }
-[data-theme="excel"] .users-header { border-bottom-color: #d4d4d4; font-size: 11px; }
+[data-theme="excel"] .users-panel { background: #f3f3f3; border-left: 1px solid #d4d4d4; }
+[data-theme="excel"] .users-header { border-bottom-color: #d4d4d4; font-size: 11px; color: #616161; font-weight: 400; }
+[data-theme="excel"] #users-panel-title { color: #616161; }
+[data-theme="excel"] #user-count { background: #e0e0e0; color: #616161; }
+[data-theme="excel"] .user-name { color: #1f1f1f !important; }
+[data-theme="excel"] .user-avatar { color: #616161; }
+[data-theme="excel"] .user-item.me { opacity: 1; }
+[data-theme="excel"] .btn-dm { display: none; }
 
 /* Excel status bar */
 .excel-statusbar {
