@@ -1981,7 +1981,22 @@ button:focus-visible, input:focus-visible {
     grid-template-columns: 1fr !important;
 }
 [data-theme="terminal"] .sidebar { display: none !important; }
-[data-theme="terminal"] .users-panel { display: none !important; }
+[data-theme="terminal"] .users-panel {
+    display: none !important;
+    background: #0a0a0a; border-left: 1px solid #333;
+}
+[data-theme="terminal"] .users-panel.term-open {
+    display: flex !important;
+    position: fixed; top: 51px; right: 0; bottom: 0; width: 220px;
+    z-index: 8998;
+}
+[data-theme="terminal"] .users-panel.term-open .users-header {
+    background: #0a0a0a; border-bottom-color: #333; color: #ccc;
+    font-family: Consolas, 'Courier New', monospace; font-size: 12px;
+}
+[data-theme="terminal"] .users-panel.term-open #user-count { background: #1a1a1a; color: #888; border-radius: 0; }
+[data-theme="terminal"] .users-panel.term-open .user-item { border-radius: 0; }
+[data-theme="terminal"] .users-panel.term-open .users-footer { border-top-color: #333; }
 [data-theme="terminal"] .mobile-nav { display: none !important; }
 
 /* Hide lobby header extras for clean terminal look */

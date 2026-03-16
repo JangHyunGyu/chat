@@ -1395,6 +1395,9 @@ class WorkChat {
         document.getElementById('btn-disguise-settings')?.addEventListener('click', () => {
             document.getElementById('settings-panel').classList.toggle('open');
         });
+        document.getElementById('btn-term-users')?.addEventListener('click', () => {
+            document.getElementById('users-panel').classList.toggle('term-open');
+        });
 
         // Invite user modal
         document.getElementById('btn-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
