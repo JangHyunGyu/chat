@@ -1964,7 +1964,50 @@ button:focus-visible, input:focus-visible {
 [data-theme="vscode"] .btn-leave-room:hover { background: rgba(255,255,255,0.1); color: #fff; }
 [data-theme="vscode"] .chat-header-right .btn-icon { font-size: 14px; }
 [data-theme="vscode"] .users-panel { background: #252526; border-left-color: #3c3c3c; }
-[data-theme="vscode"] .users-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 400; border-bottom-color: #3c3c3c; }
+[data-theme="vscode"] .users-header {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 400;
+    border-bottom-color: #3c3c3c; height: 28px; background: #252526;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+[data-theme="vscode"] #users-panel-title { font-size: 0; }
+[data-theme="vscode"] #users-panel-title::before { content: "OUTLINE"; font-size: 11px; letter-spacing: 1px; }
+[data-theme="vscode"] #user-count { display: none; }
+[data-theme="vscode"] .user-list { padding: 0; }
+[data-theme="vscode"] .user-item {
+    border-radius: 0; padding: 2px 8px 2px 16px; margin: 0; gap: 6px;
+}
+[data-theme="vscode"] .user-item:hover { background: #2a2d2e; }
+[data-theme="vscode"] .user-avatar { display: none; }
+[data-theme="vscode"] .user-name {
+    color: #cccccc !important; font-size: 13px;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-weight: 400;
+}
+[data-theme="vscode"] .user-name::before { content: "⚡ "; color: #c8c832; font-size: 11px; }
+[data-theme="vscode"] .user-item.me { opacity: 1; }
+[data-theme="vscode"] .btn-dm { color: #555; font-size: 11px; }
+[data-theme="vscode"] .btn-dm:hover { background: #37373d; color: #ccc; }
+[data-theme="vscode"] .users-footer { display: none; }
+
+/* VSCode: hide/restyle chat-specific elements */
+[data-theme="vscode"] .btn-new-room { font-size: 0; }
+[data-theme="vscode"] .btn-new-room::before { content: "New File..."; font-size: 13px; }
+[data-theme="vscode"] .btn-new-room span { display: none; }
+[data-theme="vscode"] .section-label { font-size: 0; }
+[data-theme="vscode"] .section-label::before { content: "OPEN EDITORS"; font-size: 11px; letter-spacing: 0.8px; color: #858585; }
+[data-theme="vscode"] .room-list-empty { font-size: 0; }
+[data-theme="vscode"] .room-list-empty::before { content: "No editors are open."; font-size: 12px; color: #858585; }
+[data-theme="vscode"] #my-name-display { font-size: 12px; color: #858585; font-weight: 400; }
+[data-theme="vscode"] .my-avatar { background: #3c3c3c; font-size: 11px; }
+[data-theme="vscode"] .msg-system { text-align: left; align-self: flex-start; color: #6a9955; }
+[data-theme="vscode"] #lobby-msg-input::placeholder { color: #555; }
+[data-theme="vscode"] .lobby-user-count { display: none; }
+[data-theme="vscode"] .btn-primary.btn-sm-text { display: none; }
+[data-theme="vscode"] .lobby-title { font-size: 0; }
+[data-theme="vscode"] .lobby-title::before { content: "TERMINAL"; font-size: 11px; letter-spacing: 0.5px; color: #cccccc; font-weight: 400; }
+[data-theme="vscode"] .room-item-name { font-size: 13px; font-weight: 400; }
+[data-theme="vscode"] .room-item-meta { font-size: 11px; }
+[data-theme="vscode"] .room-item-icon { font-size: 0; }
+[data-theme="vscode"] .room-item-icon::before { content: "#"; font-size: 14px; color: #858585; }
 
 /* =========================
    Terminal/PuTTY Disguise
