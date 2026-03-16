@@ -2243,6 +2243,8 @@ button:focus-visible, input:focus-visible {
 }
 [data-theme="excel"] .msg-system::before { content: "// "; }
 [data-theme="excel"] .lobby-user-count { display: none; }
+[data-theme="excel"] .lobby-title { font-size: 0; }
+[data-theme="excel"] .lobby-title::before { content: "로비 채팅"; font-size: 13px; }
 [data-theme="excel"] .input-area {
     background: #fff; border-top: 1px solid #d4d4d4; height: auto; padding: 4px 8px;
 }
