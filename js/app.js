@@ -612,6 +612,11 @@ class WorkChat {
         const input = document.getElementById('lobby-msg-input');
         const text = input.value.trim();
         if (!text || !this.lobbyNet.connected) return;
+        if (text === '/clear') {
+            document.getElementById('lobby-messages').innerHTML = '';
+            input.value = '';
+            return;
+        }
         this.lobbyNet.sendChat(text);
         input.value = '';
         input.focus();
@@ -866,6 +871,11 @@ class WorkChat {
         const input = document.getElementById('msg-input');
         const text = input.value.trim();
         if (!text || !this.currentRoomId) return;
+        if (text === '/clear') {
+            document.getElementById('messages').innerHTML = '';
+            input.value = '';
+            return;
+        }
         if (!this.network.connected) {
             this.showToast('서버 연결이 끊어졌습니다.');
             return;
