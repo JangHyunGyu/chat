@@ -1981,23 +1981,32 @@ button:focus-visible, input:focus-visible {
     grid-template-columns: 1fr !important;
 }
 [data-theme="terminal"] .sidebar { display: none !important; }
-[data-theme="terminal"] .users-panel {
-    display: none !important;
-    background: #0a0a0a; border-left: 1px solid #333;
-}
-[data-theme="terminal"] .users-panel.term-open {
-    display: flex !important;
-    position: fixed; top: 51px; right: 0; bottom: 0; width: 220px;
-    z-index: 8998;
-}
-[data-theme="terminal"] .users-panel.term-open .users-header {
-    background: #0a0a0a; border-bottom-color: #333; color: #ccc;
-    font-family: Consolas, 'Courier New', monospace; font-size: 12px;
-}
-[data-theme="terminal"] .users-panel.term-open #user-count { background: #1a1a1a; color: #888; border-radius: 0; }
-[data-theme="terminal"] .users-panel.term-open .user-item { border-radius: 0; }
-[data-theme="terminal"] .users-panel.term-open .users-footer { border-top-color: #333; }
 [data-theme="terminal"] .mobile-nav { display: none !important; }
+[data-theme="terminal"] #app {
+    grid-template-areas: "main users" !important;
+    grid-template-columns: 1fr 160px !important;
+}
+[data-theme="terminal"] .users-panel {
+    display: flex !important;
+    background: #000 !important; border-left: 1px solid #333 !important;
+}
+[data-theme="terminal"] .users-panel:not(.visible) { display: flex !important; }
+[data-theme="terminal"] .users-header {
+    background: #000; border-bottom: 1px solid #333; color: #555;
+    font-family: Consolas, 'Courier New', monospace; font-size: 11px;
+    height: 24px; min-height: 24px; padding: 0 8px;
+}
+[data-theme="terminal"] #users-panel-title { color: #555; font-size: 10px; }
+[data-theme="terminal"] #users-panel-title::before { content: "# "; }
+[data-theme="terminal"] #user-count { background: #111; color: #555; border-radius: 0; font-size: 10px; }
+[data-theme="terminal"] .user-list { padding: 2px 0; }
+[data-theme="terminal"] .user-item { border-radius: 0; padding: 2px 8px; margin: 0; gap: 4px; }
+[data-theme="terminal"] .user-item:hover { background: #111; }
+[data-theme="terminal"] .user-avatar { font-size: 11px; color: #555; }
+[data-theme="terminal"] .user-name { color: #888 !important; font-size: 12px; font-family: Consolas, 'Courier New', monospace; }
+[data-theme="terminal"] .user-item.me .user-name { color: #aaa !important; }
+[data-theme="terminal"] .btn-dm { display: none; }
+[data-theme="terminal"] .users-footer { display: none; }
 
 /* Hide lobby header extras for clean terminal look */
 [data-theme="terminal"] .lobby-header { background: #000; border-bottom-color: #333; }
