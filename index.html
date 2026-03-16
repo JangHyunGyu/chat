@@ -11,7 +11,8 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon.svg">
     <title>Chat</title>
-    <link rel="stylesheet" href="css/style.css?v=20260316c">
+    <link rel="stylesheet" id="main-css">
+    <script>document.getElementById('main-css').href='css/style.css?t='+Date.now();</script>
 </head>
 <body>
 
@@ -401,7 +402,11 @@
 <!-- ━━━━━ Toast Notification ━━━━━ -->
 <div id="toast" class="toast"></div>
 
-<script src="js/network.js?v=20260316c"></script>
-<script src="js/app.js?v=20260316c"></script>
+<script>
+(function(){var t=Date.now();
+var a=document.createElement('script');a.src='js/network.js?t='+t;document.body.appendChild(a);
+a.onload=function(){var b=document.createElement('script');b.src='js/app.js?t='+t;document.body.appendChild(b);};
+})();
+</script>
 </body>
 </html>
