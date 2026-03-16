@@ -695,6 +695,17 @@ class WorkChat {
 
         this.lobbyNet.on('roomInvite', (msg) => {
             if (msg.targetId !== this.lobbyNet.playerId) return;
+            // DM 초대는 자동 수락
+            if (msg.roomName && msg.roomName.startsWith('DM:')) {
+                this.showToast(`${msg.fromName}님의 DM에 자동 입장합니다.`);
+                if (this.currentRoomId) {
+                    this.network.leaveRoom();
+                    this.network.disconnect();
+                    this.showWelcomeState();
+                }
+                this.doJoinRoom(msg.roomId, msg.password);
+                return;
+            }
             this.showInviteDialog(msg.fromName, msg.roomId, msg.roomName, msg.password);
         });
 
