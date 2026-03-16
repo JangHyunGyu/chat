@@ -1946,17 +1946,18 @@ button:focus-visible, input:focus-visible {
 [data-theme="vscode"] .messages-area { background: #1e1e1e; gap: 0; padding: 8px 12px; }
 [data-theme="vscode"] .msg { max-width: 100%; }
 [data-theme="vscode"] .msg-self { align-self: flex-start; }
-[data-theme="vscode"] .msg-self .msg-header { flex-direction: row; }
+[data-theme="vscode"] .msg-header { display: none; }
 [data-theme="vscode"] .msg-text {
     background: transparent !important; border-radius: 0; padding: 1px 0;
     font-family: Consolas, 'Courier New', monospace; font-size: 13px; color: #cccccc;
 }
+[data-theme="vscode"] .msg-text::before { content: "$ "; color: #569cd6; }
 [data-theme="vscode"] .msg-self .msg-text { background: transparent !important; color: #cccccc; }
-[data-theme="vscode"] .msg-name { font-size: 13px; font-family: Consolas, 'Courier New', monospace; }
-[data-theme="vscode"] .msg-name::before { content: ""; }
-[data-theme="vscode"] .msg-time { display: none; }
-[data-theme="vscode"] .msg-system { font-family: Consolas, 'Courier New', monospace; font-size: 12px; text-align: left; color: #6a9955; }
-[data-theme="vscode"] .msg-header { margin-bottom: 0; }
+[data-theme="vscode"] .msg-system {
+    font-family: Consolas, 'Courier New', monospace; font-size: 12px;
+    text-align: left; align-self: flex-start; color: #6a9955;
+}
+[data-theme="vscode"] .msg-system::before { content: "// "; color: #6a9955; }
 [data-theme="vscode"] .sidebar-header { border-bottom-color: #3c3c3c; }
 [data-theme="vscode"] .section-label::before { content: ""; }
 [data-theme="vscode"] .room-item-icon { font-size: 12px; }
