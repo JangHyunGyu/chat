@@ -352,7 +352,7 @@
     <div class="disguise-wctl"><span class="wctl">─</span><span class="wctl">□</span><span class="wctl wctl-x">✕</span></div>
 </div>
 <div class="disguise-el disguise-terminal term-menubar">
-    <span class="term-mi disguise-settings-btn">설정</span><span class="term-mi" id="btn-term-users">참여자</span><span class="term-mi">Edit</span><span class="term-mi">View</span><span class="term-mi">Connection</span><span class="term-mi">Window</span><span class="term-mi">Help</span>
+    <span class="term-mi disguise-settings-btn">설정</span><span class="term-mi" onclick="(function(){var p=document.getElementById('users-panel');var o=p.style.display==='flex';p.style.display=o?'none':'flex';p.classList.toggle('term-open',!o)})()">참여자</span><span class="term-mi">Edit</span><span class="term-mi">View</span><span class="term-mi">Connection</span><span class="term-mi">Window</span><span class="term-mi">Help</span>
 </div>
 
 <!-- Excel Chrome -->
