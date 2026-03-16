@@ -2264,7 +2264,8 @@ button:focus-visible, input:focus-visible {
 [data-theme="excel"] .user-name { color: #1f1f1f !important; }
 [data-theme="excel"] .user-avatar { color: #616161; }
 [data-theme="excel"] .user-item.me { opacity: 1; }
-[data-theme="excel"] .btn-dm { display: none; }
+[data-theme="excel"] .btn-dm { color: #616161; font-size: 11px; }
+[data-theme="excel"] .btn-dm:hover { background: #e0e0e0; color: #217346; }
 
 /* Excel status bar */
 .excel-statusbar {
