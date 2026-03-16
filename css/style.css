@@ -1989,13 +1989,28 @@ button:focus-visible, input:focus-visible {
 [data-theme="terminal"] .btn-primary.btn-sm-text { display: none; }
 [data-theme="terminal"] .input-area { background: #000; border-top-color: #333; }
 
-/* Terminal settings button - hidden by default, shown only in terminal theme */
-.btn-terminal-settings { display: none; background: transparent; color: var(--text-secondary); font-size: 13px; padding: 4px 8px; cursor: pointer; gap: 4px; align-items: center; }
-.btn-terminal-settings:hover { color: var(--text-primary); }
-[data-theme="terminal"] .btn-terminal-settings { display: inline-flex; }
+/* Disguise settings button - hidden by default, shown only in disguise themes */
+.btn-terminal-settings {
+    display: none; background: transparent; font-size: 12px; padding: 3px 8px;
+    cursor: pointer; gap: 4px; align-items: center; border-radius: 0;
+    font-family: Consolas, 'Courier New', monospace;
+}
+[data-theme="terminal"] .btn-terminal-settings {
+    display: inline-flex; color: #555; border: 1px solid #333;
+}
+[data-theme="terminal"] .btn-terminal-settings:hover { color: #aaa; border-color: #555; }
+[data-theme="vscode"] .btn-terminal-settings {
+    display: inline-flex; color: #858585; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px;
+}
+[data-theme="vscode"] .btn-terminal-settings:hover { color: #cccccc; }
+[data-theme="excel"] .btn-terminal-settings {
+    display: inline-flex; color: rgba(255,255,255,0.7); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px;
+}
+[data-theme="excel"] .btn-terminal-settings:hover { color: #fff; }
 
 /* Terminal: restyle chat content to look like actual terminal */
-[data-theme="terminal"] .lobby-header { height: 0; padding: 0; border: none; overflow: hidden; }
+[data-theme="terminal"] .lobby-header { background: #000; border-bottom: 1px solid #333; height: auto; min-height: 28px; padding: 2px 8px; }
+[data-theme="terminal"] .lobby-header-left { display: none; }
 [data-theme="terminal"] .chat-header { background: #000; border-bottom-color: #333; height: 28px; }
 [data-theme="terminal"] #current-room-name { font-size: 13px; font-weight: 400; }
 [data-theme="terminal"] .messages-area { background: #000; gap: 0; padding: 4px 8px; }
