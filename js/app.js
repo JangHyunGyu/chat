@@ -1392,7 +1392,7 @@ class WorkChat {
                 document.getElementById('settings-panel').classList.toggle('open');
             });
         });
-        document.getElementById('btn-terminal-settings')?.addEventListener('click', () => {
+        document.getElementById('btn-disguise-settings')?.addEventListener('click', () => {
             document.getElementById('settings-panel').classList.toggle('open');
         });
 

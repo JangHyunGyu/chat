@@ -1989,24 +1989,41 @@ button:focus-visible, input:focus-visible {
 [data-theme="terminal"] .btn-primary.btn-sm-text { display: none; }
 [data-theme="terminal"] .input-area { background: #000; border-top-color: #333; }
 
-/* Disguise settings button - hidden by default, shown only in disguise themes */
-.btn-terminal-settings {
-    display: none; background: transparent; font-size: 12px; padding: 3px 8px;
-    cursor: pointer; gap: 4px; align-items: center; border-radius: 0;
+/* Floating disguise settings button - always visible in disguise themes */
+.btn-disguise-settings {
+    display: none;
+    position: fixed;
+    bottom: 32px;
+    right: 12px;
+    z-index: 8999;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+.btn-disguise-settings:hover { opacity: 1; }
+[data-theme="terminal"] .btn-disguise-settings {
+    display: inline-flex;
+    background: #1a1a1a; color: #888; border: 1px solid #333; border-radius: 0;
     font-family: Consolas, 'Courier New', monospace;
+    bottom: 8px;
 }
-[data-theme="terminal"] .btn-terminal-settings {
-    display: inline-flex; color: #555; border: 1px solid #333;
+[data-theme="vscode"] .btn-disguise-settings {
+    display: inline-flex;
+    background: #007acc; color: #fff; border-radius: 2px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    bottom: 26px; right: 8px; font-size: 11px; padding: 3px 10px;
 }
-[data-theme="terminal"] .btn-terminal-settings:hover { color: #aaa; border-color: #555; }
-[data-theme="vscode"] .btn-terminal-settings {
-    display: inline-flex; color: #858585; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px;
+[data-theme="excel"] .btn-disguise-settings {
+    display: inline-flex;
+    background: #217346; color: #fff; border-radius: 3px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    bottom: 50px; right: 8px; font-size: 11px; padding: 4px 12px;
 }
-[data-theme="vscode"] .btn-terminal-settings:hover { color: #cccccc; }
-[data-theme="excel"] .btn-terminal-settings {
-    display: inline-flex; color: rgba(255,255,255,0.7); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px;
-}
-[data-theme="excel"] .btn-terminal-settings:hover { color: #fff; }
 
 /* Terminal: restyle chat content to look like actual terminal */
 [data-theme="terminal"] .lobby-header { background: #000; border-bottom: 1px solid #333; height: auto; min-height: 28px; padding: 2px 8px; }
