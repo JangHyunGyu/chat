@@ -2257,15 +2257,28 @@ button:focus-visible, input:focus-visible {
 [data-theme="excel"] .sidebar-header { background: #217346; border-bottom: 1px solid #185c37; }
 [data-theme="excel"] .sidebar-actions { border-bottom: 1px solid #e0e0e0; }
 [data-theme="excel"] .sidebar-footer { border-top-color: #e0e0e0; }
-[data-theme="excel"] .users-panel { background: #f3f3f3; border-left: 1px solid #d4d4d4; }
-[data-theme="excel"] .users-header { border-bottom-color: #d4d4d4; font-size: 11px; color: #616161; font-weight: 400; }
-[data-theme="excel"] #users-panel-title { color: #616161; }
-[data-theme="excel"] #user-count { background: #e0e0e0; color: #616161; }
-[data-theme="excel"] .user-name { color: #1f1f1f !important; }
-[data-theme="excel"] .user-avatar { color: #616161; }
+[data-theme="excel"] .users-panel {
+    background: #fff; border-left: 1px solid #d4d4d4;
+}
+[data-theme="excel"] .users-header {
+    border-bottom: 1px solid #d4d4d4; font-size: 11px; color: #616161;
+    font-weight: 400; background: #f3f3f3; height: 20px; min-height: 20px;
+    padding: 0 8px; font-family: 'Segoe UI', system-ui, sans-serif;
+}
+[data-theme="excel"] #users-panel-title { color: #616161; font-size: 10px; }
+[data-theme="excel"] #user-count { display: none; }
+[data-theme="excel"] .user-list { padding: 0; }
+[data-theme="excel"] .user-item {
+    border-radius: 0; padding: 3px 8px; margin: 0;
+    border-bottom: 1px solid #e8e8e8; gap: 6px;
+}
+[data-theme="excel"] .user-item:hover { background: #e2efda; }
+[data-theme="excel"] .user-name { color: #1f1f1f !important; font-size: 12px; font-family: Calibri, 'Segoe UI', sans-serif; }
+[data-theme="excel"] .user-avatar { font-size: 12px; color: #616161; }
 [data-theme="excel"] .user-item.me { opacity: 1; }
-[data-theme="excel"] .btn-dm { color: #616161; font-size: 11px; }
+[data-theme="excel"] .btn-dm { color: #b0b0b0; font-size: 10px; }
 [data-theme="excel"] .btn-dm:hover { background: #e0e0e0; color: #217346; }
+[data-theme="excel"] .users-footer { display: none; }
 
 /* Excel status bar */
 .excel-statusbar {
