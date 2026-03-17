@@ -2124,7 +2124,8 @@ button:focus-visible, input:focus-visible {
 }
 [data-theme="terminal"] #msg-input:focus,
 [data-theme="terminal"] #lobby-msg-input:focus { box-shadow: none; background: #000; }
-[data-theme="terminal"] .btn-send { display: none; }
+[data-theme="terminal"] .btn-send { background: #1a1a1a; color: #cccccc; border: 1px solid #444; border-radius: 0; font-size: 0; width: 32px; padding: 4px; }
+[data-theme="terminal"] .btn-send::before { content: "↵"; font-size: 14px; color: #0a0; }
 
 /* Title bar */
 .term-titlebar {
