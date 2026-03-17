@@ -1942,7 +1942,8 @@ button:focus-visible, input:focus-visible {
 }
 [data-theme="vscode"] #msg-input:focus,
 [data-theme="vscode"] #lobby-msg-input:focus { box-shadow: none; background: #1e1e1e; }
-[data-theme="vscode"] .btn-send { display: none; }
+[data-theme="vscode"] .btn-send { background: #0e639c; color: #fff; border: none; border-radius: 2px; font-size: 0; width: 32px; padding: 4px; }
+[data-theme="vscode"] .btn-send::before { content: "↵"; font-size: 13px; }
 [data-theme="vscode"] .messages-area { background: #1e1e1e; gap: 0; padding: 8px 12px; }
 [data-theme="vscode"] .msg { max-width: 100%; }
 [data-theme="vscode"] .msg-self { align-self: flex-start; }
