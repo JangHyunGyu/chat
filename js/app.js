@@ -66,6 +66,11 @@ class WorkChat {
         // DM pending invite
         this._pendingDMInvite = null;
 
+        // Reconnection state
+        this._lastRoomId = null;
+        this._lastRoomPassword = null;
+        this._reconnectTimer = null;
+
         this.init();
     }
 
@@ -83,6 +88,22 @@ class WorkChat {
             const g = document.getElementById('notif-permission-group');
             if (g) g.style.display = 'none';
         }
+
+        // 모바일 백그라운드 복귀 시 재접속 처리
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState !== 'visible') return;
+            // 방에 있었는데 연결이 끊긴 경우 → 재접속
+            if (this._lastRoomId && !this.currentRoomId && !this.network.connected) {
+                this.showToast('재접속 중...');
+                this.doJoinRoom(this._lastRoomId, this._lastRoomPassword);
+                return;
+            }
+            // 로비에 있는 경우 → 로비 채팅 재연결 + 방 목록 갱신
+            if (!this.currentRoomId) {
+                if (!this.lobbyNet.connected) this.connectToLobbyChat();
+                this.fetchAndRenderRooms();
+            }
+        });
 
         const inviteHandled = this.handleInviteUrl();
         if (!inviteHandled) {
@@ -788,6 +809,10 @@ class WorkChat {
     }
 
     leaveRoom() {
+        // 의도적 퇴장 시 재접속 상태 초기화
+        this._lastRoomId = null;
+        this._lastRoomPassword = null;
+        clearTimeout(this._reconnectTimer);
         this.network.leaveRoom();
         this.network.disconnect();
         this.showWelcomeState();
@@ -1113,6 +1138,9 @@ class WorkChat {
 
     setupNetworkHandlers() {
         this.network.on('roomCreated', (msg) => {
+            this._lastRoomId = null;
+            this._lastRoomPassword = null;
+            clearTimeout(this._reconnectTimer);
             this.currentRoomId = msg.roomId;
             const meta = msg.metadata || {};
             this.currentRoomName = meta.roomName || this.nickname + '의 방';
@@ -1143,6 +1171,11 @@ class WorkChat {
         });
 
         this.network.on('joined', (msg) => {
+            // 재접속 성공 시 상태 초기화
+            this._lastRoomId = null;
+            this._lastRoomPassword = null;
+            clearTimeout(this._reconnectTimer);
+
             const meta = msg.metadata || {};
             this.currentRoomId = msg.roomId;
             this.currentRoomName = meta.roomName || '채팅방';
@@ -1272,11 +1305,21 @@ class WorkChat {
 
         this.network.on('disconnected', () => {
             if (this.currentRoomId) {
+                // 재접속을 위해 방 정보 저장
+                this._lastRoomId = this.currentRoomId;
+                this._lastRoomPassword = this.currentPassword;
                 this.showWelcomeState();
                 this.fetchAndRenderRooms();
                 this.startRoomListRefresh();
                 this.connectToLobbyChat();
-                this.showToast('서버와의 연결이 끊어졌습니다.');
+                this.showToast('연결이 끊어졌습니다. 재접속 시도 중...');
+                // 2초 후 자동 재접속 시도
+                clearTimeout(this._reconnectTimer);
+                this._reconnectTimer = setTimeout(() => {
+                    if (this._lastRoomId && !this.currentRoomId) {
+                        this.doJoinRoom(this._lastRoomId, this._lastRoomPassword);
+                    }
+                }, 2000);
             }
         });
     }

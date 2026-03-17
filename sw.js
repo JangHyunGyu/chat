@@ -1,5 +1,5 @@
 // Chat Service Worker - PWA offline support
-const CACHE = 'chat-v1';
+const CACHE = 'chat-v2';
 const ASSETS = [
     '/',
     '/index.html',
@@ -30,16 +30,15 @@ self.addEventListener('fetch', (e) => {
     const url = new URL(e.request.url);
     if (url.hostname !== self.location.hostname) return;
 
+    // Network-first: 네트워크 우선, 실패 시 캐시 폴백
+    // 모든 기기가 항상 최신 코드를 받도록 보장
     e.respondWith(
-        caches.match(e.request).then(cached => {
-            const network = fetch(e.request).then(res => {
-                if (res.ok) {
-                    const copy = res.clone();
-                    caches.open(CACHE).then(c => c.put(e.request, copy));
-                }
-                return res;
-            });
-            return cached || network;
-        })
+        fetch(e.request).then(res => {
+            if (res.ok) {
+                const copy = res.clone();
+                caches.open(CACHE).then(c => c.put(e.request, copy));
+            }
+            return res;
+        }).catch(() => caches.match(e.request))
     );
 });
