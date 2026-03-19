@@ -1618,3 +1618,52 @@ class WorkChat {
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new WorkChat();
 });
+
+// ============================================================================
+// 【글로벌 에러 핸들러】 프론트엔드 에러를 D1에 기록
+// ============================================================================
+
+(function() {
+    var ERROR_ENDPOINT = 'https://chatbot-api.yama5993.workers.dev/error-logs';
+    var APP_ID = 'workchat';
+    var _lastError = '';
+    var _errorCount = 0;
+
+    function _getContext() {
+        try {
+            var parts = [];
+            var a = window.app;
+            if (a) {
+                if (a.currentRoom) parts.push('room:' + a.currentRoom);
+                if (a.nickname) parts.push('user:' + a.nickname);
+                if (a.network?.connected) parts.push('connected');
+                else parts.push('disconnected');
+            }
+            parts.push('vw:' + window.innerWidth + 'x' + window.innerHeight);
+            return parts.join(' | ');
+        } catch (_) { return ''; }
+    }
+
+    function _sendError(message, stack, url) {
+        var key = message + (url || '');
+        if (key === _lastError) { _errorCount++; if (_errorCount > 3) return; }
+        else { _lastError = key; _errorCount = 1; }
+        var context = _getContext();
+        try {
+            navigator.sendBeacon(ERROR_ENDPOINT, JSON.stringify({
+                appId: APP_ID, userId: localStorage.getItem('wc_nickname') || '',
+                message: (message || '').substring(0, 500),
+                stack: (context ? '[ctx] ' + context + '\n' : '') + (stack || '').substring(0, 1900),
+                url: (url || '').substring(0, 500)
+            }));
+        } catch (_) {}
+    }
+
+    window.addEventListener('error', function(e) {
+        _sendError(e.message, e.error?.stack || '', e.filename + ':' + e.lineno + ':' + e.colno);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+        var reason = e.reason;
+        _sendError(reason?.message || String(reason || 'Unhandled rejection'), reason?.stack || '', location.href);
+    });
+})();
