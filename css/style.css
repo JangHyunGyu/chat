@@ -563,10 +563,34 @@ a { color: var(--accent); text-decoration: none; }
     padding: 8px 12px;
     border-top: 1px solid var(--border-dark);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-footer .archerlab-link {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 4px 10px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    transition: all 0.2s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.sidebar-footer .archerlab-link:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .btn-settings-sidebar {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     background: transparent;
     color: var(--text-sidebar-muted);
     padding: 8px;
