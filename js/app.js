@@ -1628,42 +1628,71 @@ document.addEventListener('DOMContentLoaded', () => {
     var APP_ID = 'workchat';
     var _lastError = '';
     var _errorCount = 0;
+    var _session = Math.random().toString(36).substring(2, 8);
 
     function _getContext() {
         try {
-            var parts = [];
-            var a = window.app;
-            if (a) {
-                if (a.currentRoom) parts.push('room:' + a.currentRoom);
-                if (a.nickname) parts.push('user:' + a.nickname);
-                if (a.network?.connected) parts.push('connected');
-                else parts.push('disconnected');
+            var parts = ['sess:' + _session];
+            var p = window.location.pathname;
+            parts.push('path:' + p);
+            parts.push('online:' + navigator.onLine);
+            if (window.__game) {
+                var g = window.__game;
+                if (g.stateManager) {
+                    if (g.stateManager.currentDay) parts.push('day:' + g.stateManager.currentDay);
+                    if (g.stateManager.currentScene) parts.push('scene:' + g.stateManager.currentScene);
+                }
             }
             parts.push('vw:' + window.innerWidth + 'x' + window.innerHeight);
             return parts.join(' | ');
-        } catch (_) { return ''; }
+        } catch (_) { return 'ctx-error'; }
     }
 
-    function _sendError(message, stack, url) {
-        var key = message + (url || '');
-        if (key === _lastError) { _errorCount++; if (_errorCount > 3) return; }
+    function _isNoise(msg, stack, src) {
+        if (!msg) return true;
+        if (msg === 'Script error.' && !stack) return true;
+        if (/Can't find variable: (gmo|__gCrWeb|ytcfg|__)/.test(msg)) return true;
+        if (/ResizeObserver loop|Loading chunk|dynamically imported module/.test(msg)) return true;
+        // External scripts (GA, Cloudflare, browser extensions)
+        if (src && /googletagmanager|google-analytics|gtag\/js|cloudflare|chrome-extension|moz-extension|safari-extension/.test(src)) return true;
+        // Unknown source with no relevant stack trace
+        if (src && /^undefined:/.test(src) && !(stack || '').match(/\/(assets|js|modules)\//)) return true;
+        return false;
+    }
+
+    function _sendError(type, msg, stack, src) {
+        if (_isNoise(msg, stack, src)) return;
+        var key = msg + '|' + src;
+        if (key === _lastError) { _errorCount++; if (_errorCount > 5) return; }
         else { _lastError = key; _errorCount = 1; }
-        var context = _getContext();
-        try {
-            navigator.sendBeacon(ERROR_ENDPOINT, JSON.stringify({
-                appId: APP_ID, userId: localStorage.getItem('wc_nickname') || '',
-                message: (message || '').substring(0, 500),
-                stack: (context ? '[ctx] ' + context + '\n' : '') + (stack || '').substring(0, 1900),
-                url: (url || '').substring(0, 500)
-            }));
-        } catch (_) {}
+
+        var ctx = _getContext();
+        var payload = {
+            appId: APP_ID, userId: '',
+            message: ('[' + type + '] ' + (msg || '')).substring(0, 500),
+            stack: (
+                '[ctx] ' + ctx +
+                '\n[src] ' + (src || 'N/A') +
+                '\n[ua] ' + navigator.userAgent.substring(0, 150) +
+                '\n[ref] ' + (document.referrer || 'direct') +
+                '\n[time] ' + new Date().toISOString() +
+                '\n[trace]\n' + (stack || 'no stack')
+            ).substring(0, 2000),
+            url: (src || window.location.href).substring(0, 500)
+        };
+
+        try { navigator.sendBeacon(ERROR_ENDPOINT, JSON.stringify(payload)); } catch (_) {}
     }
 
     window.addEventListener('error', function(e) {
-        _sendError(e.message, e.error?.stack || '', e.filename + ':' + e.lineno + ':' + e.colno);
+        var src = (e.filename || '') + ':' + e.lineno + ':' + e.colno;
+        _sendError(e.error?.name || 'Error', e.message, e.error?.stack || '', src);
     });
+
     window.addEventListener('unhandledrejection', function(e) {
         var reason = e.reason;
-        _sendError(reason?.message || String(reason || 'Unhandled rejection'), reason?.stack || '', location.href);
+        var msg = reason?.message || String(reason || 'Unhandled rejection');
+        var stack = reason?.stack || '';
+        _sendError('UnhandledRejection', msg, stack, window.location.href);
     });
 })();
