@@ -32,13 +32,23 @@ self.addEventListener('fetch', (e) => {
 
     // Network-first: 네트워크 우선, 실패 시 캐시 폴백
     // 모든 기기가 항상 최신 코드를 받도록 보장
+    const networkResult = fetch(e.request).then(res => {
+        let cacheWrite = Promise.resolve();
+        if (res.ok) {
+            const copy = res.clone();
+            cacheWrite = caches.open(CACHE).then(c => c.put(e.request, copy));
+        }
+        return { response: res, cacheWrite };
+    });
+
+    e.waitUntil(
+        networkResult
+            .then(result => result.cacheWrite)
+            .catch(() => {})
+    );
     e.respondWith(
-        fetch(e.request).then(res => {
-            if (res.ok) {
-                const copy = res.clone();
-                caches.open(CACHE).then(c => c.put(e.request, copy));
-            }
-            return res;
-        }).catch(() => caches.match(e.request))
+        networkResult
+            .then(result => result.response)
+            .catch(() => caches.match(e.request))
     );
 });

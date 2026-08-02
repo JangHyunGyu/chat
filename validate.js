@@ -252,6 +252,15 @@ if (swJs) {
     console.log('  \u274C sw.js not readable');
 }
 
+if (swJs) {
+    if (!swJs.includes('e.waitUntil(') || !swJs.includes('result => result.cacheWrite')) {
+        addError('sw-cache-lifetime', 'Service worker cache writes must extend the fetch event lifetime');
+    }
+    if (!/const copy = res\.clone\(\);[\s\S]*?cacheWrite = caches\.open/.test(swJs)) {
+        addError('sw-cache-clone', 'Network responses must be cloned before asynchronous cache access');
+    }
+}
+
 // ═══════════════════════════════════════════
 // 6. DOM ID cross-reference (JS getElementById <-> HTML id)
 // ═══════════════════════════════════════════
