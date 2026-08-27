@@ -1,11 +1,25 @@
-# WorkChat
-> Internal team chat application.
+# ArcherLab Chat
+> Free real-time anonymous chat service that runs in a web browser without installation.
 
 ## About
-WorkChat is a web-based team communication tool for internal use.
+ArcherLab Chat supports lobby conversations, user-created chat rooms, and one-to-one conversations from a browser.
+
+## Features
+- Real-time anonymous chat
+- Lobby chat
+- Public and private chat rooms
+- One-to-one conversations
+- Browser-based access without installation
 
 ## Links
-- Developer: https://archerlab.dev
+- [Chat](https://chat.archerlab.dev/)
+- [Anonymous chat without signup guide](https://chat.archerlab.dev/seo/anonymous-chat-no-signup.html)
+- [Browser chat room guide](https://chat.archerlab.dev/seo/browser-chat-room.html)
+- [Sitemap](https://chat.archerlab.dev/sitemap.xml)
+- [Developer](https://archerlab.dev/)
+
+## Language
+- Korean
 
 ## Category
-Team Chat, Communication, Internal Tool
+Anonymous Chat, Real-Time Chat, Browser Chat, Social Networking
