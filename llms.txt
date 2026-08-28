@@ -15,6 +15,7 @@ ArcherLab Chat supports lobby conversations, user-created chat rooms, and one-to
 - [Chat](https://chat.archerlab.dev/)
 - [Anonymous chat without signup guide](https://chat.archerlab.dev/seo/anonymous-chat-no-signup.html)
 - [Browser chat room guide](https://chat.archerlab.dev/seo/browser-chat-room.html)
+- [Anonymous chat safety guide](https://chat.archerlab.dev/seo/anonymous-chat-safety-guide.html): Privacy, external-link, boundary, and exit guidance for anonymous conversations
 - [Sitemap](https://chat.archerlab.dev/sitemap.xml)
 - [Developer](https://archerlab.dev/)
 
