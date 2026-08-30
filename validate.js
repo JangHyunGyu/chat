@@ -30,6 +30,15 @@ function readFile(relPath) {
     return fs.readFileSync(full, 'utf-8');
 }
 
+function readPngDimensions(relPath) {
+    const full = path.join(ROOT, relPath);
+    if (!fs.existsSync(full)) return null;
+    const data = fs.readFileSync(full);
+    const pngSignature = '89504e470d0a1a0a';
+    if (data.length < 24 || data.subarray(0, 8).toString('hex') !== pngSignature) return null;
+    return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+}
+
 // ═══════════════════════════════════════════
 // 1. Required files exist
 // ═══════════════════════════════════════════
@@ -40,6 +49,11 @@ const REQUIRED_FILES = [
     'css/style.css',
     'manifest.json',
     'sw.js',
+    'icons/icon.svg',
+    'icons/icon-192.png',
+    'icons/icon-512.png',
+    'icons/icon-maskable-512.png',
+    'icons/apple-touch-icon.png',
 ];
 
 console.log('\n--- 1. Required Files ---');
@@ -100,6 +114,36 @@ if (html) {
         console.log('  (no script/css references found)');
         addWarning('html-refs', 'No script or CSS references found in HTML');
     }
+
+    const inlineHandlers = html.match(/\son[a-z]+\s*=/gi) || [];
+    if (inlineHandlers.length === 0) {
+        console.log('  ✅ No inline event handlers');
+    } else {
+        console.log(`  ❌ Found ${inlineHandlers.length} inline event handler(s)`);
+        addError('html-events', 'Inline event handlers must be replaced with JavaScript listeners');
+    }
+
+    const appleTouchIcon = html.match(/<link\s+[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["'][^>]*>/i);
+    const appleTouchDimensions = appleTouchIcon ? readPngDimensions(appleTouchIcon[1]) : null;
+    if (appleTouchIcon && /\.png$/i.test(appleTouchIcon[1]) && appleTouchDimensions?.width === 180 && appleTouchDimensions?.height === 180) {
+        console.log(`  ✅ Apple touch icon: ${appleTouchIcon[1]} (180x180)`);
+    } else {
+        console.log('  ❌ Apple touch icon must reference a local 180x180 PNG');
+        addError('html-icons', 'apple-touch-icon must reference an existing 180x180 PNG');
+    }
+
+    const socialImageChecks = [
+        ['og:image', /<meta\s+[^>]*property=["']og:image["'][^>]*content=["']([^"']+\.png)["'][^>]*>/i],
+        ['twitter:image', /<meta\s+[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+\.png)["'][^>]*>/i],
+    ];
+    for (const [name, pattern] of socialImageChecks) {
+        if (pattern.test(html)) {
+            console.log(`  ✅ ${name} uses a PNG preview`);
+        } else {
+            console.log(`  ❌ ${name} PNG preview missing`);
+            addError('html-icons', `${name} must reference a PNG preview image`);
+        }
+    }
 } else {
     console.log('  \u274C Cannot check - index.html not readable');
 }
@@ -124,6 +168,13 @@ if (manifestRaw) {
             }
         }
 
+        if (manifest.id === '/') {
+            console.log('  ✅ Stable app id is "/"');
+        } else {
+            console.log('  ❌ Stable app id must be "/"');
+            addError('manifest', 'manifest.json must define id as "/"');
+        }
+
         // Check icons array is non-empty
         if (Array.isArray(manifest.icons) && manifest.icons.length > 0) {
             console.log(`  \u2705 icons array has ${manifest.icons.length} entry(ies)`);
@@ -132,10 +183,39 @@ if (manifestRaw) {
                 const iconPath = icon.src.replace(/^\//, '');
                 if (fileExists(iconPath)) {
                     console.log(`  \u2705 Icon file: ${icon.src}`);
+                    if (icon.type === 'image/png') {
+                        const dimensions = readPngDimensions(iconPath);
+                        const declaredSize = /^(\d+)x(\d+)$/.exec(icon.sizes || '');
+                        if (!dimensions || !declaredSize || dimensions.width !== Number(declaredSize[1]) || dimensions.height !== Number(declaredSize[2])) {
+                            console.log(`  ❌ PNG dimensions do not match manifest: ${icon.src}`);
+                            addError('manifest', `PNG dimensions do not match declared size: ${icon.src}`);
+                        }
+                    }
                 } else {
                     console.log(`  \u274C Icon file missing: ${icon.src}`);
                     addError('manifest', `Icon file not found: ${icon.src}`);
                 }
+            }
+
+            const hasPngSize = size => manifest.icons.some(icon =>
+                icon.type === 'image/png' && icon.sizes === size && fileExists(icon.src.replace(/^\//, ''))
+            );
+            const hasMaskable = manifest.icons.some(icon =>
+                icon.type === 'image/png' && /(^|\s)maskable(\s|$)/.test(icon.purpose || '')
+            );
+            for (const size of ['192x192', '512x512']) {
+                if (hasPngSize(size)) {
+                    console.log(`  ✅ Raster fallback: ${size}`);
+                } else {
+                    console.log(`  ❌ Raster fallback missing: ${size}`);
+                    addError('manifest', `PNG icon with size ${size} is required`);
+                }
+            }
+            if (hasMaskable) {
+                console.log('  ✅ Dedicated maskable PNG icon');
+            } else {
+                console.log('  ❌ Dedicated maskable PNG icon missing');
+                addError('manifest', 'A maskable PNG icon is required');
             }
         } else {
             console.log(`  \u274C icons array is empty or not an array`);
@@ -281,15 +361,19 @@ if (html && appJs) {
         jsIds.add(m[1]);
     }
 
-    // Also check for IDs constructed dynamically (common pattern: 'invite-dialog')
-    // We skip IDs that look dynamically constructed (containing template literals)
+    // Collect literal IDs created dynamically in JavaScript.
+    const runtimeIds = new Set();
+    const assignedIdRegex = /\.id\s*=\s*['"]([^'"]+)['"]/g;
+    const templateIdRegex = /\bid=["']([^"']+)["']/g;
+    while ((m = assignedIdRegex.exec(jsContent)) !== null) runtimeIds.add(m[1]);
+    while ((m = templateIdRegex.exec(jsContent)) !== null) runtimeIds.add(m[1]);
 
     let missingCount = 0;
     let matchCount = 0;
     const missingIds = [];
 
     for (const id of jsIds) {
-        if (htmlIds.has(id)) {
+        if (htmlIds.has(id) || runtimeIds.has(id)) {
             matchCount++;
         } else {
             missingIds.push(id);

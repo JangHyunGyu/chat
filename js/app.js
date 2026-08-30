@@ -1498,6 +1498,9 @@ class WorkChat {
                 panel.style.display = isOpen ? 'flex' : 'none';
             }
         });
+        document.getElementById('btn-term-new-room')?.addEventListener('click', () => {
+            document.getElementById('btn-new-room')?.click();
+        });
 
         // Invite user modal
         document.getElementById('btn-invite-user')?.addEventListener('click', () => this.openInviteUserModal());

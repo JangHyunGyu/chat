@@ -2188,6 +2188,8 @@ button:focus-visible, input:focus-visible {
 }
 .term-mi { padding: 0 8px; display: flex; align-items: center; cursor: default; }
 .term-mi:hover { background: #333; }
+button.term-mi { border: 0; color: inherit; background: transparent; font: inherit; line-height: inherit; }
+button.term-mi:focus-visible { outline: 1px solid currentColor; outline-offset: -2px; }
 
 /* =========================
    Excel Disguise Chrome

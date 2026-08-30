@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Chat">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 	<link rel="icon" href="favicon.svg" type="image/svg+xml">
     <title>Chat - 실시간 익명 채팅 | ArcherLab</title>
@@ -18,7 +18,11 @@
     <meta name="keywords" content="무료 채팅, 익명 채팅, 실시간 채팅, 웹 채팅, 채팅방, 온라인 채팅, 브라우저 채팅, free chat, anonymous chat, real-time chat">
     <meta property="og:title" content="Chat - 실시간 익명 채팅">
     <meta property="og:description" content="설치 없이 브라우저에서 바로 대화. 채팅방 생성, 로비 채팅, 1:1 대화까지.">
-    <meta property="og:image" content="https://chat.archerlab.dev/icons/icon.svg">
+    <meta property="og:image" content="https://chat.archerlab.dev/icons/icon-512.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:alt" content="ArcherLab Chat 앱 아이콘">
     <meta property="og:url" content="https://chat.archerlab.dev/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ko_KR">
@@ -26,6 +30,8 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Chat - 실시간 익명 채팅">
     <meta name="twitter:description" content="설치 없이 브라우저에서 바로 대화. 무료 실시간 웹 채팅.">
+    <meta name="twitter:image" content="https://chat.archerlab.dev/icons/icon-512.png">
+    <meta name="twitter:image:alt" content="ArcherLab Chat 앱 아이콘">
     <link rel="canonical" href="https://chat.archerlab.dev/">
     <link rel="alternate" hreflang="ko" href="https://chat.archerlab.dev/">
     <link rel="alternate" hreflang="x-default" href="https://chat.archerlab.dev/">
@@ -377,7 +383,7 @@
     <div class="disguise-wctl"><span class="wctl">─</span><span class="wctl">□</span><span class="wctl wctl-x">✕</span></div>
 </div>
 <div class="disguise-el disguise-terminal term-menubar">
-    <span class="term-mi disguise-settings-btn">설정</span><span class="term-mi" onclick="(function(){var p=document.getElementById('users-panel');var o=p.style.display==='flex';p.style.display=o?'none':'flex';p.classList.toggle('term-open',!o)})()">참여자</span><span class="term-mi" onclick="document.getElementById('btn-new-room').click()">새방</span><span class="term-mi">View</span><span class="term-mi">Connection</span><span class="term-mi">Window</span><span class="term-mi">Help</span>
+    <button type="button" class="term-mi disguise-settings-btn">설정</button><button type="button" class="term-mi" id="btn-term-users">참여자</button><button type="button" class="term-mi" id="btn-term-new-room">새방</button><span class="term-mi">View</span><span class="term-mi">Connection</span><span class="term-mi">Window</span><span class="term-mi">Help</span>
 </div>
 
 <!-- Excel Chrome -->

@@ -1,5 +1,5 @@
 // Chat Service Worker - PWA offline support
-const CACHE = 'chat-v2';
+const CACHE = 'chat-v3';
 const ASSETS = [
     '/',
     '/index.html',
@@ -8,6 +8,10 @@ const ASSETS = [
     '/js/app.js',
     '/manifest.json',
     '/icons/icon.svg',
+    '/icons/icon-192.png',
+    '/icons/icon-512.png',
+    '/icons/icon-maskable-512.png',
+    '/icons/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (e) => {
