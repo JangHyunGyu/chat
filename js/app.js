@@ -10,7 +10,7 @@ const MAX_PLAYERS_LIMIT = 100;
 // ─── PWA: Service Worker Registration ───
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=3').catch(() => {});
     });
 }
 

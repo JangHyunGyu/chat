@@ -14,6 +14,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
+const APP_VERSION = '3';
 const errors = [];
 const warnings = [];
 
@@ -142,6 +143,16 @@ if (html) {
         } else {
             console.log(`  ❌ ${name} PNG preview missing`);
             addError('html-icons', `${name} must reference a PNG preview image`);
+        }
+    }
+
+    const versionedHtmlAssets = ['manifest.json', 'css/style.css', 'js/network.js', 'js/app.js'];
+    for (const asset of versionedHtmlAssets) {
+        if (html.includes(`${asset}?v=${APP_VERSION}`)) {
+            console.log(`  ✅ Versioned asset reference: ${asset}?v=${APP_VERSION}`);
+        } else {
+            console.log(`  ❌ Versioned asset reference missing: ${asset}`);
+            addError('html-cache', `${asset} must use the current app version`);
         }
     }
 } else {
@@ -333,12 +344,24 @@ if (swJs) {
 }
 
 if (swJs) {
+    if (!swJs.includes(`const CACHE = 'chat-v${APP_VERSION}'`)) {
+        addError('sw-cache-version', 'Service worker cache name must match the current app version');
+    }
+    for (const asset of ['css/style.css', 'js/network.js', 'js/app.js', 'manifest.json']) {
+        if (!swJs.includes(`/${asset}?v=${APP_VERSION}`)) {
+            addError('sw-cache-version', `Service worker must precache ${asset} with the current app version`);
+        }
+    }
     if (!swJs.includes('e.waitUntil(') || !swJs.includes('result => result.cacheWrite')) {
         addError('sw-cache-lifetime', 'Service worker cache writes must extend the fetch event lifetime');
     }
     if (!/const copy = res\.clone\(\);[\s\S]*?cacheWrite = caches\.open/.test(swJs)) {
         addError('sw-cache-clone', 'Network responses must be cloned before asynchronous cache access');
     }
+}
+
+if (appJs && !appJs.includes(`navigator.serviceWorker.register('/sw.js?v=${APP_VERSION}')`)) {
+    addError('sw-register-version', 'Service worker registration must use the current app version');
 }
 
 // ═══════════════════════════════════════════
