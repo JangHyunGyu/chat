@@ -23,25 +23,33 @@
     return Boolean(el.closest?.('[contenteditable="true"]'));
   }
 
-  function keyboardInset() {
-    if (!isEditing()) return 0;
-    const vk = Math.round(root.navigator?.virtualKeyboard?.boundingRect?.height || 0);
+  function keyboardOverlapFrom(metrics) {
+    if (!metrics?.editing) return 0;
+    const layout = Math.max(metrics.innerHeight || 0, metrics.clientHeight || 0);
+    const vvOverlap = metrics.vvHeight == null
+      ? 0
+      : Math.max(0, Math.round(layout - metrics.vvHeight - (metrics.vvOffsetTop || 0)));
+    const vk = Math.round(metrics.vkHeight || 0);
+    return Math.max(vk > 80 ? vk : 0, vvOverlap > 80 ? vvOverlap : 0);
+  }
+
+  function keyboardOverlap() {
     const vv = root.visualViewport;
-    const layout = Math.max(root.innerHeight || 0, doc.documentElement.clientHeight || 0);
-    const vvOverlap = vv ? Math.max(0, Math.round(layout - vv.height - (vv.offsetTop || 0))) : 0;
-    // Overlay keyboards (typical in fullscreen) do not shrink visualViewport.
-    if (vk > 80 && vvOverlap <= 80) return vk;
-    return vvOverlap > 80 ? vvOverlap : 0;
+    return keyboardOverlapFrom({
+      editing: isEditing(),
+      innerHeight: root.innerHeight || 0,
+      clientHeight: doc.documentElement.clientHeight || 0,
+      vvHeight: vv ? vv.height : null,
+      vvOffsetTop: vv ? vv.offsetTop || 0 : 0,
+      vkHeight: root.navigator?.virtualKeyboard?.boundingRect?.height || 0
+    });
   }
 
   function bindKeyboard() {
     const vk = root.navigator?.virtualKeyboard;
-    if (vk) {
-      try { vk.overlaysContent = true; } catch (_) {}
-      if (!vkBound && vk.addEventListener) {
-        vkBound = true;
-        vk.addEventListener('geometrychange', syncLayout);
-      }
+    if (vk && !vkBound && vk.addEventListener) {
+      vkBound = true;
+      vk.addEventListener('geometrychange', syncLayout);
     }
     if (root.visualViewport && !vvBound) {
       vvBound = true;
@@ -53,14 +61,15 @@
   function syncLayout() {
     const el = doc.documentElement;
     const fs = isFullscreen();
-    const keyboard = fs ? keyboardInset() : 0;
-    const hint = fs ? hintInset : 0;
-    const inset = Math.max(keyboard, hint);
+    const keyboard = keyboardOverlap();
+    const hint = fs && keyboard === 0 ? hintInset : 0;
     el.classList?.toggle('archer-immersive-fs', fs);
     el.classList?.toggle('archer-immersive-hint', fs && hint > 0);
-    el.classList?.toggle('archer-immersive-keyboard', fs && keyboard > 0);
-    el.style.setProperty?.('--immersive-bottom-inset', `${inset}px`);
-    el.style.transform = inset ? `translate3d(0,-${inset}px,0)` : '';
+    el.style.setProperty?.('--immersive-bottom-inset', `${hint}px`);
+    el.style.setProperty?.('--immersive-keyboard-inset', `${keyboard}px`);
+    // Hint only: a short lift so the browser exit toast does not cover controls.
+    // Keyboard inset is left to each app so fullscreen and windowed layouts stay independent.
+    el.style.transform = hint ? `translate3d(0,-${hint}px,0)` : '';
   }
 
   function startHint() {
@@ -95,7 +104,6 @@
       const result = element.requestFullscreen
         ? element.requestFullscreen({ navigationUI: 'hide' })
         : (element.webkitRequestFullscreen || element.msRequestFullscreen).call(element);
-      // Older WebKit returns void; denial must never interrupt game startup.
       pending = Promise.resolve(result).then(() => {
         onFullscreenChange();
         return true;
@@ -125,15 +133,10 @@
   function onGesture(event) {
     const target = event.target;
     if (!event.isTrusted || !target?.closest || target.closest('a, input, textarea, select, [contenteditable], [data-ranking-scroll], [data-no-fullscreen]')) return;
-    // Phone, tablet, and desktop: any trusted play gesture forces immersive entry.
     if (target.closest('[data-fullscreen-start], canvas, [data-fullscreen-play], [data-fullscreen-force], button, [role="button"]')) autoEnter();
   }
 
-  // Click retains activation for touch, mouse and native keyboard buttons.
-  // Never preventDefault: navigation, focus, audio and game input keep working.
   doc.addEventListener('click', onGesture, true);
-  // Canvas engines can cancel compatibility clicks after a touch. Pointer-up
-  // still carries touch activation; Enter covers their keyboard-only menus.
   doc.addEventListener('pointerup', event => {
     if (event.target?.closest?.('canvas, [data-fullscreen-start], [data-fullscreen-play], button, [role="button"]')) onGesture(event);
   }, true);
@@ -141,7 +144,6 @@
     if (event.isTrusted && event.key === 'Enter' && !event.repeat &&
         ['BODY', 'CANVAS', 'BUTTON'].includes(event.target?.tagName)) autoEnter();
   }, true);
-  // First trusted interaction anywhere that is not an excluded control.
   doc.addEventListener('pointerdown', event => {
     const target = event.target;
     if (!event.isTrusted || !target?.closest || target.closest('a, input, textarea, select, [contenteditable], [data-ranking-scroll], [data-no-fullscreen]')) return;
@@ -159,6 +161,10 @@
   root.addEventListener('pageshow', event => {
     if (event.persisted) attempted = false;
   });
-  root.ArcherImmersive = Object.freeze({ enter, autoEnter, exit, isFullscreen, isStandalone, supported,
-    toggle: () => isFullscreen() ? exit() : enter() });
+  bindKeyboard();
+  root.ArcherImmersive = Object.freeze({
+    enter, autoEnter, exit, isFullscreen, isStandalone, supported,
+    keyboardOverlap, keyboardOverlapFrom,
+    toggle: () => isFullscreen() ? exit() : enter()
+  });
 })(window);

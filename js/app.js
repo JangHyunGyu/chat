@@ -113,6 +113,36 @@ class WorkChat {
                 this.showSetupModal();
             }
         }
+
+        this.setupKeyboardInset();
+    }
+
+    setupKeyboardInset() {
+        const sync = () => {
+            const el = document.activeElement;
+            const editing = !!(el && el.matches?.('input, textarea, [contenteditable="true"]'));
+            const fullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+            let inset = 0;
+            if (editing) {
+                const vk = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
+                const vv = window.visualViewport;
+                const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+                const vvOverlap = vv ? Math.max(0, Math.round(layout - vv.height - (vv.offsetTop || 0))) : 0;
+                const overlap = Math.max(vk > 80 ? vk : 0, vvOverlap > 80 ? vvOverlap : 0);
+                inset = fullscreen || overlap > 80 ? overlap : 0;
+            }
+            document.documentElement.style.setProperty('--keyboard-inset', `${inset}px`);
+            document.documentElement.classList.toggle('is-keyboard-open', inset > 0);
+        };
+        window.visualViewport?.addEventListener('resize', sync);
+        window.visualViewport?.addEventListener('scroll', sync);
+        window.addEventListener('resize', sync);
+        document.addEventListener('fullscreenchange', sync);
+        document.addEventListener('webkitfullscreenchange', sync);
+        document.addEventListener('focusin', sync);
+        document.addEventListener('focusout', () => setTimeout(sync, 60));
+        navigator.virtualKeyboard?.addEventListener?.('geometrychange', sync);
+        sync();
     }
 
     // ─────────────────── Settings ───────────────────

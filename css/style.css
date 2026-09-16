@@ -36,6 +36,7 @@
     --mobile-nav-h: 56px;
     --chat-header-h: 52px;
     --input-area-h: 68px;
+    --keyboard-inset: 0px;
 }
 
 /* ─── Reset & Base ─── */
@@ -1058,6 +1059,11 @@ a { color: var(--accent); text-decoration: none; }
     pointer-events: all;
 }
 
+html.is-keyboard-open .modal-overlay.active {
+    align-items: flex-end;
+    padding-bottom: calc(16px + var(--keyboard-inset, 0px));
+}
+
 .modal-box {
     background: var(--bg-main);
     border-radius: 12px;
@@ -1460,7 +1466,7 @@ input[type="range"] {
 .mobile-nav {
     display: none;
     position: fixed;
-    bottom: 0;
+    bottom: var(--keyboard-inset, 0px);
     left: 0;
     right: 0;
     height: var(--mobile-nav-h);
@@ -1535,27 +1541,27 @@ input[type="range"] {
     #app {
         grid-template-areas: "main";
         grid-template-columns: 1fr;
-        height: calc(100dvh - var(--mobile-nav-h));
+        height: calc(100dvh - var(--mobile-nav-h) - var(--keyboard-inset, 0px));
         position: relative;
     }
 
     .sidebar {
         grid-area: main;
         position: fixed;
-        inset: 0 0 var(--mobile-nav-h) 0;
+        inset: 0 0 calc(var(--mobile-nav-h) + var(--keyboard-inset, 0px)) 0;
         z-index: 100;
         display: flex;
     }
 
     .main-area {
         position: fixed;
-        inset: 0 0 var(--mobile-nav-h) 0;
+        inset: 0 0 calc(var(--mobile-nav-h) + var(--keyboard-inset, 0px)) 0;
         z-index: 100;
     }
 
     .users-panel {
         position: fixed;
-        inset: 0 0 var(--mobile-nav-h) 0;
+        inset: 0 0 calc(var(--mobile-nav-h) + var(--keyboard-inset, 0px)) 0;
         z-index: 100;
         display: flex;
         border-left: none;
