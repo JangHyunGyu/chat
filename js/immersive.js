@@ -4,11 +4,8 @@
   if (root.ArcherImmersive) return;
   const doc = root.document;
   const HINT_PX = 80;
-  const HINT_MS = 2000;
   let pending = null;
   let attempted = false;
-  let hintInset = 0;
-  let hintTimer = null;
   let vvBound = false;
   let vkBound = false;
 
@@ -62,7 +59,9 @@
     const el = doc.documentElement;
     const fs = isFullscreen();
     const keyboard = keyboardOverlap();
-    const hint = fs && keyboard === 0 ? hintInset : 0;
+    // Native fullscreen-exit toasts cannot be dismissed. Keep bottom controls
+    // lifted for the whole fullscreen session so they stay tappable.
+    const hint = fs && keyboard === 0 ? HINT_PX : 0;
     el.classList?.toggle('archer-immersive-fs', fs);
     el.classList?.toggle('archer-immersive-hint', fs && hint > 0);
     el.style.setProperty?.('--immersive-bottom-inset', `${hint}px`);
@@ -72,27 +71,9 @@
     el.style.transform = hint ? `translate3d(0,-${hint}px,0)` : '';
   }
 
-  function startHint() {
-    hintInset = HINT_PX;
-    if (hintTimer != null && root.clearTimeout) root.clearTimeout(hintTimer);
-    hintTimer = root.setTimeout ? root.setTimeout(() => {
-      hintInset = 0;
-      hintTimer = null;
-      syncLayout();
-    }, HINT_MS) : null;
-    syncLayout();
-  }
-
   function onFullscreenChange() {
-    if (isFullscreen()) {
-      bindKeyboard();
-      startHint();
-    } else {
-      hintInset = 0;
-      if (hintTimer != null && root.clearTimeout) root.clearTimeout(hintTimer);
-      hintTimer = null;
-      syncLayout();
-    }
+    if (isFullscreen()) bindKeyboard();
+    syncLayout();
   }
 
   function enter() {
