@@ -15,6 +15,7 @@ const path = require('path');
 
 const ROOT = __dirname;
 const APP_VERSION = '3';
+const STYLE_VERSION = '4';
 const errors = [];
 const warnings = [];
 
@@ -148,8 +149,9 @@ if (html) {
 
     const versionedHtmlAssets = ['manifest.json', 'css/style.css', 'js/network.js', 'js/app.js'];
     for (const asset of versionedHtmlAssets) {
-        if (html.includes(`${asset}?v=${APP_VERSION}`)) {
-            console.log(`  ✅ Versioned asset reference: ${asset}?v=${APP_VERSION}`);
+        const version = asset === 'css/style.css' ? STYLE_VERSION : APP_VERSION;
+        if (html.includes(`${asset}?v=${version}`)) {
+            console.log(`  ✅ Versioned asset reference: ${asset}?v=${version}`);
         } else {
             console.log(`  ❌ Versioned asset reference missing: ${asset}`);
             addError('html-cache', `${asset} must use the current app version`);
@@ -348,7 +350,8 @@ if (swJs) {
         addError('sw-cache-version', 'Service worker cache name must match the current app version');
     }
     for (const asset of ['css/style.css', 'js/network.js', 'js/app.js', 'manifest.json']) {
-        if (!swJs.includes(`/${asset}?v=${APP_VERSION}`)) {
+        const version = asset === 'css/style.css' ? STYLE_VERSION : APP_VERSION;
+        if (!swJs.includes(`/${asset}?v=${version}`)) {
             addError('sw-cache-version', `Service worker must precache ${asset} with the current app version`);
         }
     }

@@ -3,7 +3,7 @@ const CACHE = 'chat-v3';
 const ASSETS = [
     '/',
     '/index.html',
-    '/css/style.css?v=3',
+    '/css/style.css?v=4',
     '/js/network.js?v=3',
     '/js/app.js?v=3',
     '/manifest.json?v=3',
