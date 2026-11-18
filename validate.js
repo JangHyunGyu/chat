@@ -431,6 +431,45 @@ if (html && appJs) {
 }
 
 // ═══════════════════════════════════════════
+// 7. Sitemap & SEO canonical URLs
+// ═══════════════════════════════════════════
+console.log('\n--- 7. Sitemap & SEO Canonical URLs ---');
+const sitemapXml = readFile('sitemap.xml');
+if (!sitemapXml) {
+    addError('seo-sitemap', 'sitemap.xml missing or unreadable');
+} else {
+    const locs = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1].trim());
+    if (locs.length === 0) {
+        addError('seo-sitemap', 'sitemap.xml contains no <loc> entries');
+    }
+    for (const loc of locs) {
+        if (/\.html$/i.test(loc)) {
+            addError('seo-sitemap', `Sitemap URL must omit .html suffix: ${loc}`);
+            continue;
+        }
+        const pathname = new URL(loc).pathname;
+        const targetRel = pathname === '/' ? 'index.html' : `${pathname.replace(/^\//, '')}.html`;
+        const targetHtml = readFile(targetRel);
+        if (!targetHtml) {
+            addError('seo-sitemap', `Sitemap target file missing for ${loc}: ${targetRel}`);
+            continue;
+        }
+        const canonical = (targetHtml.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i) || [])[1];
+        const ogUrl = (targetHtml.match(/<meta[^>]+property=["']og:url["'][^>]+content=["']([^"']+)["']/i) || [])[1];
+        if (canonical !== loc) {
+            addError('seo-canonical', `${targetRel}: canonical "${canonical}" !== sitemap "${loc}"`);
+        }
+        if (ogUrl !== loc) {
+            addError('seo-og-url', `${targetRel}: og:url "${ogUrl}" !== sitemap "${loc}"`);
+        }
+        if (/href=["']\/?seo\/[^"']+\.html/i.test(targetHtml)) {
+            addError('seo-links', `${targetRel}: internal SEO link still uses .html suffix`);
+        }
+    }
+    console.log(`  Checked ${locs.length} sitemap URL(s) and canonical/og:url parity`);
+}
+
+// ═══════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════
 console.log('\n' + '='.repeat(50));
