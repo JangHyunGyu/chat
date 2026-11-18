@@ -117,14 +117,14 @@ class WorkChat {
         this.setupKeyboardInset();
     }
 
-    setupKeyboardInset() {
-        const sync = () => {
+    setupKeyboardInset() { var __oc3, __oc4, __oc5, __oc6;
+        const sync = () => { var __oc0, __oc1, __oc2;
             const el = document.activeElement;
-            const editing = !!(el && el.matches?.('input, textarea, [contenteditable="true"]'));
+            const editing = !!(el && (((__oc0 = el.matches) === null || __oc0 === void 0 ? void 0 : __oc0.call(el, 'input, textarea, [contenteditable="true"]'))));
             const fullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
             let inset = 0;
             if (editing) {
-                const vk = Math.round(navigator.virtualKeyboard?.boundingRect?.height || 0);
+                const vk = Math.round((((__oc2 = (__oc1 = navigator.virtualKeyboard) === null || __oc1 === void 0 ? void 0 : __oc1.boundingRect) === null || __oc2 === void 0 ? void 0 : __oc2.height)) || 0);
                 const vv = window.visualViewport;
                 const layout = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
                 const vvOverlap = vv ? Math.max(0, Math.round(layout - vv.height - (vv.offsetTop || 0))) : 0;
@@ -134,14 +134,14 @@ class WorkChat {
             document.documentElement.style.setProperty('--keyboard-inset', `${inset}px`);
             document.documentElement.classList.toggle('is-keyboard-open', inset > 0);
         };
-        window.visualViewport?.addEventListener('resize', sync);
-        window.visualViewport?.addEventListener('scroll', sync);
+        (((__oc3 = window.visualViewport) === null || __oc3 === void 0 ? void 0 : __oc3.addEventListener('resize', sync)));
+        (((__oc4 = window.visualViewport) === null || __oc4 === void 0 ? void 0 : __oc4.addEventListener('scroll', sync)));
         window.addEventListener('resize', sync);
         document.addEventListener('fullscreenchange', sync);
         document.addEventListener('webkitfullscreenchange', sync);
         document.addEventListener('focusin', sync);
         document.addEventListener('focusout', () => setTimeout(sync, 60));
-        navigator.virtualKeyboard?.addEventListener?.('geometrychange', sync);
+        (((__oc6 = (__oc5 = navigator.virtualKeyboard) === null || __oc5 === void 0 ? void 0 : __oc5.addEventListener) === null || __oc6 === void 0 ? void 0 : __oc6.call(__oc5, 'geometrychange', sync)));
         sync();
     }
 
@@ -335,13 +335,13 @@ class WorkChat {
         try {
             const data = await this.network.fetchRooms(RELAY_URL);
             this.renderRooms(data.rooms || []);
-        } catch {
+        } catch (_err) {
             const el = document.getElementById('room-list-el');
             if (el) el.innerHTML = '<div class="room-list-empty">서버 연결 실패</div>';
         }
     }
 
-    renderRooms(rooms) {
+    renderRooms(rooms) { var __oc7, __oc8, __oc9, __oc10;
         const el = document.getElementById('room-list-el');
         if (!el) return;
 
@@ -352,10 +352,10 @@ class WorkChat {
 
         el.innerHTML = '';
         for (const room of rooms) {
-            const isPrivate = room.metadata?.password;
-            const roomName = room.metadata?.roomName || room.hostName + '의 방';
-            const topic = room.metadata?.topic || '';
-            const maxP = room.metadata?.maxPlayers || MAX_PLAYERS_DEFAULT;
+            const isPrivate = (((__oc7 = room.metadata) === null || __oc7 === void 0 ? void 0 : __oc7.password));
+            const roomName = (((__oc8 = room.metadata) === null || __oc8 === void 0 ? void 0 : __oc8.roomName)) || room.hostName + '의 방';
+            const topic = (((__oc9 = room.metadata) === null || __oc9 === void 0 ? void 0 : __oc9.topic)) || '';
+            const maxP = (((__oc10 = room.metadata) === null || __oc10 === void 0 ? void 0 : __oc10.maxPlayers)) || MAX_PLAYERS_DEFAULT;
             const isFull = room.playerCount >= maxP;
             const isCurrent = room.roomId === this.currentRoomId;
 
@@ -385,11 +385,11 @@ class WorkChat {
         this.addLobbyMessage('', '로비에 연결 중...', 'system');
         try {
             await this.lobbyNet.joinRoom(RELAY_URL, LOBBY_ROOM_ID, this.nickname, null);
-        } catch {
+        } catch (_err) {
             // Lobby room may not exist yet - try creating it (first user ever)
             try {
                 await this.lobbyNet.createRoom(RELAY_URL, this.nickname, null);
-            } catch {
+            } catch (_err) {
                 this.addLobbyMessage('', '로비 채팅 연결 실패. 새로고침 해주세요.', 'system');
             }
         }
@@ -588,7 +588,7 @@ class WorkChat {
         if (Notification.permission !== 'granted') return;
         try {
             new Notification(title, { body, icon: '/icons/icon.svg' });
-        } catch {}
+        } catch (_err) {}
     }
 
     playMentionSound() {
@@ -604,7 +604,7 @@ class WorkChat {
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.3);
-        } catch {}
+        } catch (_err) {}
     }
 
     // ─────────────────── DM ───────────────────
@@ -732,7 +732,9 @@ class WorkChat {
         });
 
         this.lobbyNet.on('playerLeft', (msg) => {
-            const leftUser = this.lobbyUsers.find(u => !msg.players?.find(p => p.id === u.id));
+            const leftUser = this.lobbyUsers.find(u => { var __oc11; return (
+!(((__oc11 = msg.players) === null || __oc11 === void 0 ? void 0 : __oc11.find(p => p.id === u.id)))
+); });
             if (leftUser) this.addLobbyMessage('', `${leftUser.name}님이 로비에서 나갔습니다.`, 'system');
             if (msg.players) { this.lobbyUsers = msg.players; this.updateLobbyCount(); }
         });
@@ -773,16 +775,16 @@ class WorkChat {
 
     // ─────────────────── Room Actions ───────────────────
 
-    tryJoinRoom(room) {
+    tryJoinRoom(room) { var __oc12, __oc13;
         if (!this.nickname) { this.showSetupModal(); return; }
 
-        const maxP = room.metadata?.maxPlayers || MAX_PLAYERS_DEFAULT;
+        const maxP = (((__oc12 = room.metadata) === null || __oc12 === void 0 ? void 0 : __oc12.maxPlayers)) || MAX_PLAYERS_DEFAULT;
         if (room.playerCount >= maxP) {
             this.showToast('채팅방이 가득 찼습니다.');
             return;
         }
 
-        if (room.metadata?.password) {
+        if ((((__oc13 = room.metadata) === null || __oc13 === void 0 ? void 0 : __oc13.password))) {
             this.pendingJoinRoom = room;
             document.getElementById('join-password').value = '';
             document.getElementById('password-modal').classList.add('active');
@@ -831,7 +833,7 @@ class WorkChat {
                 password: !!password,
                 maxPlayers: maxPlayers || MAX_PLAYERS_DEFAULT,
             });
-        } catch {
+        } catch (_err) {
             this.showToast('방 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
             this.startRoomListRefresh();
             this.connectToLobbyChat();
@@ -944,7 +946,7 @@ class WorkChat {
 
     // ─────────────────── User List ───────────────────
 
-    renderUsers(users) {
+    renderUsers(users) { var __oc14, __oc15;
         this.users = users;
         const el = document.getElementById('user-list');
         if (!el) return;
@@ -986,14 +988,14 @@ class WorkChat {
             }
 
             if (this.isHost && !isMe) {
-                item.querySelector('.btn-kick')?.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.kickUser(u.id, u.name);
-                });
-                item.querySelector('.btn-transfer')?.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.transferHostTo(u.id, u.name);
-                });
+                (((__oc14 = item.querySelector('.btn-kick')) === null || __oc14 === void 0 ? void 0 : __oc14.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.kickUser(u.id, u.name);
+    })));
+                (((__oc15 = item.querySelector('.btn-transfer')) === null || __oc15 === void 0 ? void 0 : __oc15.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.transferHostTo(u.id, u.name);
+    })));
             }
 
             el.appendChild(item);
@@ -1216,7 +1218,7 @@ class WorkChat {
 
             const players = msg.players || [];
             const hostPlayer = players.find(p => p.isHost);
-            this.displayHostId = hostPlayer?.id || null;
+            this.displayHostId = ((hostPlayer === null || hostPlayer === void 0 ? void 0 : hostPlayer.id)) || null;
 
             if (!this.checkNicknameUniqueness(players)) return;
 
@@ -1239,7 +1241,9 @@ class WorkChat {
         });
 
         this.network.on('playerLeft', (msg) => {
-            const leftUser = this.users.find(u => !msg.players?.find(p => p.id === u.id));
+            const leftUser = this.users.find(u => { var __oc16; return (
+!(((__oc16 = msg.players) === null || __oc16 === void 0 ? void 0 : __oc16.find(p => p.id === u.id)))
+); });
             if (leftUser) this.addMessage('', `${leftUser.name}님이 퇴장했습니다.`, 'system');
 
             if (msg.players) {
@@ -1356,7 +1360,7 @@ class WorkChat {
 
     // ─────────────────── Event Listeners ───────────────────
 
-    setupEventListeners() {
+    setupEventListeners() { var __oc17, __oc18, __oc19, __oc21, __oc22, __oc23, __oc24, __oc25, __oc26, __oc27, __oc28, __oc29, __oc30, __oc31;
         // Setup modal
         document.getElementById('btn-setup-start').addEventListener('click', () => this.handleSetupSubmit());
         document.getElementById('setup-name').addEventListener('keydown', (e) => {
@@ -1412,20 +1416,22 @@ class WorkChat {
         });
 
         // Topic change (host)
-        document.getElementById('current-room-topic')?.addEventListener('click', () => {
-            if (this.isHost) this.changeTopicInline();
-        });
+        (((__oc17 = document.getElementById('current-room-topic')) === null || __oc17 === void 0 ? void 0 : __oc17.addEventListener('click', () => {
+        if (this.isHost)
+            this.changeTopicInline();
+    })));
 
         // Pin message button
-        document.getElementById('btn-pin-message')?.addEventListener('click', () => {
-            const text = prompt('공지 메시지를 입력하세요:');
-            if (text && text.trim()) this.pinCurrentMessage(text.trim().slice(0, 200));
-        });
+        (((__oc18 = document.getElementById('btn-pin-message')) === null || __oc18 === void 0 ? void 0 : __oc18.addEventListener('click', () => {
+        const text = prompt('공지 메시지를 입력하세요:');
+        if (text && text.trim())
+            this.pinCurrentMessage(text.trim().slice(0, 200));
+    })));
 
         // Notification permission button
-        document.getElementById('btn-notif-permission')?.addEventListener('click', () => {
-            this.requestNotificationPermission();
-        });
+        (((__oc19 = document.getElementById('btn-notif-permission')) === null || __oc19 === void 0 ? void 0 : __oc19.addEventListener('click', () => {
+        this.requestNotificationPermission();
+    })));
 
         // Lobby chat
         document.getElementById('btn-lobby-send').addEventListener('click', () => this.sendLobbyMessage());
@@ -1434,13 +1440,13 @@ class WorkChat {
         });
 
         // Invite
-        document.getElementById('btn-copy-invite').addEventListener('click', () => {
+        document.getElementById('btn-copy-invite').addEventListener('click', () => { var __oc20;
             const link = this.generateInviteLink();
-            navigator.clipboard?.writeText(link).then(() => {
-                this.showToast('초대 링크가 클립보드에 복사되었습니다.');
-            }).catch(() => {
-                prompt('초대 링크 (복사해서 공유하세요):', link);
-            });
+            (((__oc20 = navigator.clipboard) === null || __oc20 === void 0 ? void 0 : __oc20.writeText(link).then(() => {
+        this.showToast('초대 링크가 클립보드에 복사되었습니다.');
+    }).catch(() => {
+        prompt('초대 링크 (복사해서 공유하세요):', link);
+    })));
         });
 
         // Settings panel
@@ -1460,21 +1466,22 @@ class WorkChat {
         });
 
         // Opacity slider
-        document.getElementById('opacity-slider')?.addEventListener('input', (e) => {
-            this.applyOpacity(parseInt(e.target.value) / 100);
-        });
+        (((__oc21 = document.getElementById('opacity-slider')) === null || __oc21 === void 0 ? void 0 : __oc21.addEventListener('input', (e) => {
+        this.applyOpacity(parseInt(e.target.value) / 100);
+    })));
 
         // PWA install button
-        document.getElementById('btn-install-pwa')?.addEventListener('click', async () => {
-            if (!_pwaInstallPrompt) return;
-            _pwaInstallPrompt.prompt();
-            const { outcome } = await _pwaInstallPrompt.userChoice;
-            _pwaInstallPrompt = null;
-            if (outcome === 'accepted') {
-                document.getElementById('pwa-install-group').style.display = 'none';
-                this.showToast('앱으로 설치되었습니다! 앱을 실행하면 주소창 없이 사용할 수 있습니다.');
-            }
-        });
+        (((__oc22 = document.getElementById('btn-install-pwa')) === null || __oc22 === void 0 ? void 0 : __oc22.addEventListener('click', async () => {
+        if (!_pwaInstallPrompt)
+            return;
+        _pwaInstallPrompt.prompt();
+        const { outcome } = await _pwaInstallPrompt.userChoice;
+        _pwaInstallPrompt = null;
+        if (outcome === 'accepted') {
+            document.getElementById('pwa-install-group').style.display = 'none';
+            this.showToast('앱으로 설치되었습니다! 앱을 실행하면 주소창 없이 사용할 수 있습니다.');
+        }
+    })));
 
         // Name change
         document.getElementById('btn-name-save').addEventListener('click', () => this.handleNameSave());
@@ -1494,13 +1501,13 @@ class WorkChat {
             });
         });
 
-        document.getElementById('chat-back-btn')?.addEventListener('click', () => {
-            this.setMobileView('rooms');
-        });
+        (((__oc23 = document.getElementById('chat-back-btn')) === null || __oc23 === void 0 ? void 0 : __oc23.addEventListener('click', () => {
+        this.setMobileView('rooms');
+    })));
 
-        document.getElementById('btn-toggle-members')?.addEventListener('click', () => {
-            document.getElementById('users-panel').classList.toggle('visible');
-        });
+        (((__oc24 = document.getElementById('btn-toggle-members')) === null || __oc24 === void 0 ? void 0 : __oc24.addEventListener('click', () => {
+        document.getElementById('users-panel').classList.toggle('visible');
+    })));
 
         // Theme cycle shortcut: Ctrl+Alt+T
         document.addEventListener('keydown', (e) => {
@@ -1518,29 +1525,31 @@ class WorkChat {
                 document.getElementById('settings-panel').classList.toggle('open');
             });
         });
-        document.getElementById('btn-disguise-settings')?.addEventListener('click', () => {
-            document.getElementById('settings-panel').classList.toggle('open');
-        });
-        document.getElementById('btn-term-users')?.addEventListener('click', () => {
-            const panel = document.getElementById('users-panel');
-            const isOpen = panel.classList.toggle('term-open');
-            if (this.theme === 'terminal') {
-                panel.style.display = isOpen ? 'flex' : 'none';
-            }
-        });
-        document.getElementById('btn-term-new-room')?.addEventListener('click', () => {
-            document.getElementById('btn-new-room')?.click();
-        });
+        (((__oc25 = document.getElementById('btn-disguise-settings')) === null || __oc25 === void 0 ? void 0 : __oc25.addEventListener('click', () => {
+        document.getElementById('settings-panel').classList.toggle('open');
+    })));
+        (((__oc26 = document.getElementById('btn-term-users')) === null || __oc26 === void 0 ? void 0 : __oc26.addEventListener('click', () => {
+        const panel = document.getElementById('users-panel');
+        const isOpen = panel.classList.toggle('term-open');
+        if (this.theme === 'terminal') {
+            panel.style.display = isOpen ? 'flex' : 'none';
+        }
+    })));
+        (((__oc27 = document.getElementById('btn-term-new-room')) === null || __oc27 === void 0 ? void 0 : __oc27.addEventListener('click', () => {
+        var __oc227;
+        (((__oc227 = document.getElementById('btn-new-room')) === null || __oc227 === void 0 ? void 0 : __oc227.click()));
+    })));
 
         // Invite user modal
-        document.getElementById('btn-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
-        document.getElementById('btn-header-invite-user')?.addEventListener('click', () => this.openInviteUserModal());
-        document.getElementById('btn-invite-modal-close')?.addEventListener('click', () => {
+        (((__oc28 = document.getElementById('btn-invite-user')) === null || __oc28 === void 0 ? void 0 : __oc28.addEventListener('click', () => this.openInviteUserModal())));
+        (((__oc29 = document.getElementById('btn-header-invite-user')) === null || __oc29 === void 0 ? void 0 : __oc29.addEventListener('click', () => this.openInviteUserModal())));
+        (((__oc30 = document.getElementById('btn-invite-modal-close')) === null || __oc30 === void 0 ? void 0 : __oc30.addEventListener('click', () => {
+        document.getElementById('invite-user-modal').classList.remove('active');
+    })));
+        (((__oc31 = document.getElementById('invite-user-modal')) === null || __oc31 === void 0 ? void 0 : __oc31.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget)
             document.getElementById('invite-user-modal').classList.remove('active');
-        });
-        document.getElementById('invite-user-modal')?.addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) document.getElementById('invite-user-modal').classList.remove('active');
-        });
+    })));
     }
 
     // ─────────────────── Modal Handlers ───────────────────
@@ -1582,14 +1591,14 @@ class WorkChat {
         document.getElementById('create-room-modal').classList.remove('active');
     }
 
-    handleCreateRoom() {
+    handleCreateRoom() { var __oc32;
         const name = document.getElementById('create-room-name').value.trim();
         if (!name) { this.showToast('방 이름을 입력해주세요.'); document.getElementById('create-room-name').focus(); return; }
 
         const topic = document.getElementById('create-room-topic').value.trim();
         const maxPlayers = parseInt(document.getElementById('create-capacity').value) || MAX_PLAYERS_DEFAULT;
 
-        const isPrivate = document.querySelector('.room-type-btn.active')?.dataset.type === 'private';
+        const isPrivate = (((__oc32 = document.querySelector('.room-type-btn.active')) === null || __oc32 === void 0 ? void 0 : __oc32.dataset.type)) === 'private';
         let password = null;
         if (isPrivate) {
             password = document.getElementById('create-password').value.trim();
@@ -1718,15 +1727,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try { navigator.sendBeacon(ERROR_ENDPOINT, JSON.stringify(payload)); } catch (_) {}
     }
 
-    window.addEventListener('error', function(e) {
+    window.addEventListener('error', function(e) { var __oc33, __oc34;
         var src = (e.filename || '') + ':' + e.lineno + ':' + e.colno;
-        _sendError(e.error?.name || 'Error', e.message, e.error?.stack || '', src);
+        _sendError((((__oc33 = e.error) === null || __oc33 === void 0 ? void 0 : __oc33.name)) || 'Error', e.message, (((__oc34 = e.error) === null || __oc34 === void 0 ? void 0 : __oc34.stack)) || '', src);
     });
 
     window.addEventListener('unhandledrejection', function(e) {
         var reason = e.reason;
-        var msg = reason?.message || String(reason || 'Unhandled rejection');
-        var stack = reason?.stack || '';
+        var msg = ((reason === null || reason === void 0 ? void 0 : reason.message)) || String(reason || 'Unhandled rejection');
+        var stack = ((reason === null || reason === void 0 ? void 0 : reason.stack)) || '';
         _sendError('UnhandledRejection', msg, stack, window.location.href);
     });
 })();

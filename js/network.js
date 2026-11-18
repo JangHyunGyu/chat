@@ -60,9 +60,9 @@ class NetworkClient {
                 return;
             }
 
-            const timeout = setTimeout(() => {
+            const timeout = setTimeout(() => { var __oc0;
                 reject(new Error('Connection timeout'));
-                this.ws?.close();
+                (((__oc0 = this.ws) === null || __oc0 === void 0 ? void 0 : __oc0.close()));
             }, 8000);
 
             this.ws.onopen = () => {
